@@ -108,9 +108,10 @@ class RowTemplate1(RowTemplate1Template):
             alert(f'全部完成：成功 {succ}，失败 {len(fail_ips)}，失败 IP: {info}', result)
 
         
-        delay = 10
+        delay = 5
         for r in conf_rows:
             window.setTimeout(lambda row=r: run_one(row), delay)
+            delay +=1
             # run_one(dict(r))
             
 
@@ -122,20 +123,20 @@ class RowTemplate1(RowTemplate1Template):
         ip_from = self.item['ip_use_from']
         ip_to   = self.item['ip_use_to']
         wg_listen_port =self.item['wg_listen_port']
-        
-        start = ip_to_int(ip_from)
-        end   = ip_to_int(ip_to)
-        
-        count      = 0
         max_pairs  = 2000
+
+        start = ip_to_int(ip_to)
+        end   = start+max_pairs
+        print(f'{ip_to} ----{int_to_ip(end)}')
+        count      = 0
         current    = start
         
         while current + 3 <= end and count < max_pairs:
-            server_ip_int = current + 1       # /30 中的第一个可用地址
-            client_ip_int = current + 2       # /30 中的第二个可用地址
+            client_ip_int = current + 1       # /30 中的第一个可用地址
+            server_ip_int = current + 2       # /30 中的第二个可用地址
         
-            client_ip = int_to_ip(server_ip_int)
-            server_ip = int_to_ip(client_ip_int)
+            client_ip = int_to_ip(client_ip_int)
+            server_ip = int_to_ip(server_ip_int)
 
             try:
                 server_public_ip = self.server_ips[self.server_ip_index]

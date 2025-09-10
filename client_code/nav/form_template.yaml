@@ -6,12 +6,16 @@ components:
 - event_bindings: {click: link_1_click}
   layout_properties: {slot: sidebar}
   name: link_1
-  properties: {text: 管理私网}
+  properties: {text: 管理网段}
   type: Link
 - event_bindings: {click: link_2_click}
   layout_properties: {slot: sidebar}
   name: link_2
   properties: {text: 管理服务器}
+  type: Link
+- layout_properties: {slot: sidebar}
+  name: link_3
+  properties: {text: 管理路由表}
   type: Link
 container:
   properties: {html: '@theme:dashboard.html'}
