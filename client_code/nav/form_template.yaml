@@ -1,0 +1,17 @@
+components:
+- layout_properties: {slot: default}
+  name: content_panel
+  properties: {}
+  type: ColumnPanel
+- layout_properties: {slot: sidebar}
+  name: link_1
+  properties: {text: 增加私网}
+  type: Link
+- layout_properties: {slot: sidebar}
+  name: link_2
+  properties: {}
+  type: Link
+container:
+  properties: {html: '@theme:dashboard.html'}
+  type: HtmlTemplate
+is_package: true

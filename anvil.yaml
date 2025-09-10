@@ -12,11 +12,32 @@ db_schema:
     - admin_ui: {order: 2, width: 200}
       name: info
       type: string
+    - admin_ui: {order: 3, width: 200}
+      name: wg_listen_port
+      type: number
     server: full
     title: nat_table
   wg_conf:
-    client: none
-    columns: []
+    client: full
+    columns:
+    - admin_ui: {order: 0, width: 200}
+      name: wg_server_ip
+      type: string
+    - admin_ui: {order: 1, width: 116}
+      name: wg_client_ip
+      type: string
+    - admin_ui: {order: 2, width: 185}
+      name: wg_server_conf
+      type: string
+    - admin_ui: {order: 3, width: 200}
+      name: wg_client_conf
+      type: string
+    - admin_ui: {order: 4, width: 200}
+      name: wg_server_public_ip
+      type: string
+    - admin_ui: {order: 5, width: 200}
+      name: ip_to
+      type: string
     server: full
     title: wg_conf
 name: Classic 1

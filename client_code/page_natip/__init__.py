@@ -18,10 +18,14 @@ class page_natip(page_natipTemplate):
         """This method is called when the button is clicked"""
         info = self.info.text
         used_ip_froms = []
+        used_ports =[]
         for r in app_tables.nat_table.search():
             used_ip_froms.append(r['ip_use_from'])
             used_ip_froms.append(r['ip_use_to'])
+            used_ports.append(r['wg_listen_port'])
 
+            
+        available_port = 50000
         available_from = None
         available_to = None
 
@@ -35,6 +39,8 @@ class page_natip(page_natipTemplate):
                 available_from = potential_ip_from
                 available_to = potential_ip_to
                 break # Found an available range, exit loop
-
-        app_tables.nat_table.add_row(info=info, ip_use_from=available_from, ip_use_to=available_to)
+                
+        while available_port in used_ports:
+            available_port += 1  
+        app_tables.nat_table.add_row(info=info, ip_use_from=available_from, ip_use_to=available_to,wg_listen_port=available_port)
         self.repeating_panel_1.items = app_tables.nat_table.search() 

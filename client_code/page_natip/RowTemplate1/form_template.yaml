@@ -1,13 +1,18 @@
 components:
-- event_bindings: {click: button_1_click}
-  layout_properties: {column: KCIPQO}
-  name: button_1
-  properties: {text: 删除}
-  type: Button
-- event_bindings: {click: button_2_click}
+- event_bindings: {click: make_conf_click}
   layout_properties: {column: SNHWAH}
-  name: button_2
+  name: make_conf
   properties: {text: 产生配置}
+  type: Button
+- event_bindings: {change: file_loader_1_change}
+  layout_properties: {column: TIKREY}
+  name: file_loader_1
+  properties: {}
+  type: FileLoader
+- event_bindings: {click: ssh_run_click}
+  layout_properties: {column: FVZPDX}
+  name: ssh_run
+  properties: {text: 部署}
   type: Button
 container: {type: DataRowPanel}
 is_package: true
