@@ -4,7 +4,7 @@ import anvil.server
 import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
-
+from anvil.js import window 
 def ip_to_int(ip_str):
     """
   '10.0.0.1'  ->  167772161
@@ -86,12 +86,22 @@ class RowTemplate1(RowTemplate1Template):
 
     def ssh_run_click(self, **event_args):
         """This method is called when the button is clicked"""
-        ip_to = self.item['ip_to']
-        all_conf = list(app_tables.wg_conf.search(ip_to=ip_to))
+        ip_to = self.item['ip_use_to']
+        conf_rows = list(app_tables.wg_conf.search(ip_to=ip_to))
         
-        print(all_conf)
-        pass
+        if not conf_rows:
+            alert("没有找到任何需要执行 SSH 的配置！")
+            return
+
+        # ————— 生成一个执行函数 ———————————————
+        def run_one(row):       # 要执行的命令
+            fut = anvil.server.call('ssh_exec', row)
         
+        delay = 0
+        for r in conf_rows:
+            # window.setTimeout(lambda row=r: run_one(dict(row)), delay)
+            run_one(dict(r))
+            
 
     def make_conf_click(self, **event_args):
         """This method is called when the button is clicked"""
