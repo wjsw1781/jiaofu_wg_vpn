@@ -88,19 +88,30 @@ class RowTemplate1(RowTemplate1Template):
         """This method is called when the button is clicked"""
         ip_to = self.item['ip_use_to']
         conf_rows = list(app_tables.wg_conf.search(ip_to=ip_to))
-        
-        if not conf_rows:
-            alert("没有找到任何需要执行 SSH 的配置！")
-            return
 
-        # ————— 生成一个执行函数 ———————————————
-        def run_one(row):       # 要执行的命令
-            fut = anvil.server.call('ssh_exec', row)
+        result = []
+
         
-        delay = 0
+        def run_one(row):       # 要执行的命令
+            fut = anvil.server.call('ssh_exec', dict(row))
+            result.append(fut)
+            if len(result) !=len(conf_rows):
+                return
+            succ     = sum(r['ok'] for r in result)                            # 成功条数
+            for r in result:     
+                if r['ok']:
+                    app_tables.wg_conf.get(wg_server_public_ip=r['wg_server_public_ip'])['wg_server_ok'] =  "成功"
+                else:
+                    app_tables.wg_conf.get(wg_server_public_ip=r['wg_server_public_ip'])['wg_server_ok'] =   r['stderr']
+            fail_ips = [r['wg_server_public_ip'] for r in result if not r['ok']]# 失败 IP 列表            
+            info = "\n".join(fail_ips)
+            alert(f'全部完成：成功 {succ}，失败 {len(fail_ips)}，失败 IP: {info}', result)
+
+        
+        delay = 10
         for r in conf_rows:
-            # window.setTimeout(lambda row=r: run_one(dict(row)), delay)
-            run_one(dict(r))
+            window.setTimeout(lambda row=r: run_one(row), delay)
+            # run_one(dict(r))
             
 
     def make_conf_click(self, **event_args):
@@ -184,5 +195,10 @@ class RowTemplate1(RowTemplate1Template):
         self.server_ip_index = 0    # 当前已分配到第几个
         
         alert(f"已载入 {len(ips)} 个服务器公网 IP。", title="上传成功")
+
+    def client_down_click(self, **event_args):
+        ip_to  = self.item['ip_use_to']
+        txt    = "\n\n".join(r['wg_client_conf'] for r in app_tables.wg_conf.search(ip_to=ip_to))
+        anvil.media.download(anvil.BlobMedia("text/plain", txt.encode(), "wg_clients.sh"))
 
 

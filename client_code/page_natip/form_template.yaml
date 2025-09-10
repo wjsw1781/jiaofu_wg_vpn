@@ -23,7 +23,8 @@ components:
         - {data_key: info, id: IVOOLA, title: info}
         - {data_key: column_1, id: TIKREY, title: 节点}
         - {data_key: column_1, expand: false, id: SNHWAH, title: 产生配置, width: 94.55078125}
-        - {data_key: column_1, expand: false, id: FVZPDX, title: 部署, width: 94.796875}
+        - {data_key: column_1, expand: false, id: FVZPDX, title: 服务器部署, width: 94.796875}
+        - {data_key: column_1, id: NPRMNV, title: 客户端部署}
       type: DataGrid
     layout_properties: {grid_position: 'DLXATS,FYBNHP'}
     name: card_1
@@ -33,6 +34,10 @@ components:
   name: content_panel
   properties: {}
   type: ColumnPanel
+- layout_properties: {slot: sidebar}
+  name: nav_1
+  properties: {}
+  type: form:nav
 container:
   properties: {html: '@theme:dashboard.html'}
   type: HtmlTemplate

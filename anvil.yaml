@@ -38,6 +38,12 @@ db_schema:
     - admin_ui: {order: 5, width: 200}
       name: ip_to
       type: string
+    - admin_ui: {order: 6, width: 200}
+      name: wg_server_ok
+      type: string
+    - admin_ui: {order: 7, width: 200}
+      name: wg_client_ok
+      type: string
     server: full
     title: wg_conf
 name: Classic 1

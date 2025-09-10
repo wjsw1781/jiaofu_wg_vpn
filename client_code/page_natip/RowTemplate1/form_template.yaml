@@ -12,7 +12,12 @@ components:
 - event_bindings: {click: ssh_run_click}
   layout_properties: {column: FVZPDX}
   name: ssh_run
-  properties: {text: 部署}
+  properties: {text: 服务器部署}
+  type: Button
+- event_bindings: {click: client_down_click}
+  layout_properties: {column: NPRMNV}
+  name: client_down
+  properties: {text: 客户端部署}
   type: Button
 container: {type: DataRowPanel}
 is_package: true

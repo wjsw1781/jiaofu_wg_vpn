@@ -1,8 +1,31 @@
 components:
-- layout_properties: {slot: default}
+- components:
+  - components:
+    - components:
+      - name: repeating_panel_1
+        properties: {item_template: page_ssh.RowTemplate2}
+        type: RepeatingPanel
+      layout_properties: {grid_position: 'TSUVUQ,ESUQPP'}
+      name: data_grid_1
+      properties:
+        columns:
+        - {data_key: wg_server_ip, id: KEJNHS, title: wg_server_ip}
+        - {data_key: wg_server_public_ip, id: RCVILO, title: wg_server_public_ip}
+        - {data_key: wg_server_ok, id: ROJQDZ, title: wg_server_ok}
+        - {data_key: column_1, id: PNNXIF, title: ssh}
+      type: DataGrid
+    layout_properties: {full_width_row: true, grid_position: 'QFAAUV,BCRCSQ'}
+    name: card_1
+    properties: {role: card}
+    type: ColumnPanel
+  layout_properties: {slot: default}
   name: content_panel
   properties: {}
   type: ColumnPanel
+- layout_properties: {slot: sidebar}
+  name: nav_1
+  properties: {}
+  type: form:nav
 container:
   properties: {html: '@theme:dashboard.html'}
   type: HtmlTemplate

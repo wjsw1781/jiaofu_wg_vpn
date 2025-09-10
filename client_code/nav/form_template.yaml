@@ -3,15 +3,18 @@ components:
   name: content_panel
   properties: {}
   type: ColumnPanel
-- layout_properties: {slot: sidebar}
+- event_bindings: {click: link_1_click}
+  layout_properties: {slot: sidebar}
   name: link_1
-  properties: {text: 增加私网}
+  properties: {text: 管理私网}
   type: Link
-- layout_properties: {slot: sidebar}
+- event_bindings: {click: link_2_click}
+  layout_properties: {slot: sidebar}
   name: link_2
-  properties: {}
+  properties: {text: 管理服务器}
   type: Link
 container:
   properties: {html: '@theme:dashboard.html'}
   type: HtmlTemplate
+custom_component: true
 is_package: true
