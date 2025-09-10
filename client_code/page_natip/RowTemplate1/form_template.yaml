@@ -1,3 +1,13 @@
-components: []
+components:
+- event_bindings: {click: button_1_click}
+  layout_properties: {column: KCIPQO}
+  name: button_1
+  properties: {text: 删除}
+  type: Button
+- event_bindings: {click: button_2_click}
+  layout_properties: {column: SNHWAH}
+  name: button_2
+  properties: {text: 产生配置}
+  type: Button
 container: {type: DataRowPanel}
 is_package: true

@@ -19,8 +19,8 @@ class page_natip(page_natipTemplate):
         info = self.info.text
         used_ip_froms = []
         for r in app_tables.nat_table.search():
-            used_ip_froms.append(['ip_use_from'])
-            used_ip_froms.append(['ip_use_to'])
+            used_ip_froms.append(r['ip_use_from'])
+            used_ip_froms.append(r['ip_use_to'])
 
         available_from = None
         available_to = None
@@ -28,13 +28,13 @@ class page_natip(page_natipTemplate):
         # Iterate through possible second octet values (0 to 254)
         for x in range(255): # Covers 10.0.0.0/24 to 10.254.0.0/24
             potential_ip_from = f"10.{x}.0.0"
-            potential_ip_to = f"10.{x+1}.0.255"
+            potential_ip_to = f"10.{x+1}.0.0"
 
             # Check if this IP range is not already in use
-            if potential_ip_from not in used_ip_froms:
+            if potential_ip_from not in used_ip_froms and potential_ip_to not in used_ip_froms:
                 available_from = potential_ip_from
                 available_to = potential_ip_to
                 break # Found an available range, exit loop
 
         app_tables.nat_table.add_row(info=info, ip_use_from=available_from, ip_use_to=available_to)
-        self.refresh_data_bindings()
+        self.repeating_panel_1.items = app_tables.nat_table.search() 

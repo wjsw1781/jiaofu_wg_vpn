@@ -14,6 +14,11 @@ db_schema:
       type: string
     server: full
     title: nat_table
+  wg_conf:
+    client: none
+    columns: []
+    server: full
+    title: wg_conf
 name: Classic 1
 package_name: Classic_1
 runtime_options:
