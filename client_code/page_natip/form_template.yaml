@@ -1,0 +1,36 @@
+components:
+- components:
+  - components:
+    - layout_properties: {grid_position: 'MYYDVK,FZUWQU'}
+      name: info
+      properties: {}
+      type: TextBox
+    - event_bindings: {click: button_1_click}
+      layout_properties: {grid_position: 'MYYDVK,RQOTFX'}
+      name: button_1
+      properties: {text: 新增业务}
+      type: Button
+    - components:
+      - name: repeating_panel_1
+        properties: {item_template: page_natip.RowTemplate1}
+        type: RepeatingPanel
+      layout_properties: {grid_position: 'UXQAXG,HXMHEN'}
+      name: data_grid_1
+      properties:
+        columns:
+        - {data_key: ip_use_from, id: PQXKYM, title: ip_use_from}
+        - {data_key: ip_use_to, id: JDODVA, title: ip_use_to}
+        - {data_key: info, id: IVOOLA, title: info}
+      type: DataGrid
+    layout_properties: {grid_position: 'DLXATS,FYBNHP'}
+    name: card_1
+    properties: {role: card}
+    type: ColumnPanel
+  layout_properties: {slot: default}
+  name: content_panel
+  properties: {}
+  type: ColumnPanel
+container:
+  properties: {html: '@theme:dashboard.html'}
+  type: HtmlTemplate
+is_package: true

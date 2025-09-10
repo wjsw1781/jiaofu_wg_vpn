@@ -1,4 +1,19 @@
 allow_embedding: false
+db_schema:
+  nat_table:
+    client: full
+    columns:
+    - admin_ui: {order: 0, width: 200}
+      name: ip_use_from
+      type: string
+    - admin_ui: {order: 1, width: 200}
+      name: ip_use_to
+      type: string
+    - admin_ui: {order: 2, width: 200}
+      name: info
+      type: string
+    server: full
+    title: nat_table
 name: Classic 1
 package_name: Classic_1
 runtime_options:
@@ -6,4 +21,9 @@ runtime_options:
   server_spec: {base: python310-minimal}
   server_version: python3-sandbox
   version: 2
-services: []
+services:
+- client_config: {}
+  server_config: {}
+  source: /runtime/services/tables.yml
+startup: {module: page_natip, type: form}
+startup_form: null
