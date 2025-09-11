@@ -110,47 +110,57 @@ class RowTemplate1(RowTemplate1Template):
         
         delay = 5
         for r in conf_rows:
-            window.setTimeout(lambda row=r: run_one(row), delay)
             delay +=1
-            # run_one(dict(r))
+
+            # window.setTimeout(lambda row=r: run_one(row), delay)
+            run_one(dict(r))
             
 
     def make_conf_click(self, **event_args):
         """This method is called when the button is clicked"""
     
         # 2. 拿到起止 IP
-        
+        RT_table_ID = 200
+    
         ip_from = self.item['ip_use_from']
         ip_to   = self.item['ip_use_to']
         wg_listen_port =self.item['wg_listen_port']
         max_pairs  = 2000
-
+    
         start = ip_to_int(ip_to)
         end   = start+max_pairs
-        print(f'{ip_to} ----{int_to_ip(end)}')
         count      = 0
         current    = start
-        
+    
+        all_conf = []
+        all_conf_after_threads = []
+    
+    
         while current + 3 <= end and count < max_pairs:
             client_ip_int = current + 1       # /30 中的第一个可用地址
             server_ip_int = current + 2       # /30 中的第二个可用地址
-        
+    
             client_ip = int_to_ip(client_ip_int)
             server_ip = int_to_ip(server_ip_int)
-
+    
             try:
                 server_public_ip = self.server_ips[self.server_ip_index]
                 self.server_ip_index += 1   
             except :
                 break
-            RT_table_ID = count+200
-            # —— 生成极简 WG 配置 ——（示范，用自己的逻辑替换）————
+            all_conf.append([client_ip,server_ip,server_public_ip,ip_from,ip_to,wg_listen_port,RT_table_ID])
+    
+            # 下一 /30
+            current += 4
+            count   += 1
+    
+        def thread_run_one_conf(one_conf):
+            client_ip,server_ip,server_public_ip,ip_from,ip_to,wg_listen_port,RT_table_ID = one_conf
+    
             client_conf,server_conf= anvil.server.call('get_wg_server_client_conf',client_ip,server_ip,server_public_ip,ip_from,ip_to,wg_listen_port,RT_table_ID)
-
-            
-            # —— 写入 wg_conf 表 ————————————————————————————————
+    
             row = app_tables.wg_conf.search(wg_server_ip=server_ip)
-            
+    
             if len(row):  
                 row =app_tables.wg_conf.get(wg_server_ip=server_ip)
                 row['wg_client_ip']        = client_ip
@@ -158,7 +168,7 @@ class RowTemplate1(RowTemplate1Template):
                 row['wg_client_conf']      = client_conf
                 row['wg_server_public_ip'] = server_public_ip
                 row['ip_to'] = ip_to
-                
+    
             else:                                                 # 不存在 → 新增
                 app_tables.wg_conf.add_row(
                     wg_server_ip        = server_ip,
@@ -168,13 +178,21 @@ class RowTemplate1(RowTemplate1Template):
                     wg_server_public_ip = server_public_ip,
                     ip_to = ip_to,
                 )
-        
-            # 下一 /30
-            current += 4
-            count   += 1
-        
-        alert(f"已成功生成 {count} 对地址。", title="完成")
+    
+            all_conf_after_threads.append(client_conf)
+    
+            if len(all_conf_after_threads)!=len(all_conf):
+                return
 
+            alert(f"已成功生成 {len(all_conf_after_threads)} 对地址。", title="完成")
+    
+    
+        delay = 5
+        for r in all_conf:
+            window.setTimeout(lambda row=r: thread_run_one_conf(row), delay)
+            delay +=1
+
+            
     def file_loader_1_change(self, file, **event_args):
 
             # 读取 CSV 内容（假设是 UTF-8；否则先 file.content_type 判断再选编码）
