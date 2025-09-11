@@ -216,8 +216,146 @@ class RowTemplate1(RowTemplate1Template):
 
     def client_down_click(self, **event_args):
         ip_to  = self.item['ip_use_to']
-        # 构造 hdcp 默认使用 
-        txt    = "\n\n".join(r['wg_client_conf'] for r in app_tables.wg_conf.search(ip_to=ip_to))
+        wg_client_ips    = [r['wg_client_ip'] for r in app_tables.wg_conf.search(ip_to=ip_to)]
+        # 扩充手机路由规则    获取所有 client ip 进行扩充 一对 5 占用补充 phone 手机 ip 准备 ip范围   
+        
+        now_phone = [r for r in app_tables.wg_ip_rule.search(for_key_ip_use_to_wg_16=ip_to)]
+        phone_per_cli  = 5                                            # 1 : 5
+        cursor         = ip_to_int(now_phone[0]['ip_from_phone'])
+        cursor += 1
+
+        # 第一个地址给 wifi 网卡使用  enp88s0
+        gateway_ip  = int_to_ip(cursor)
+        
+        info_template = now_phone[0]['info']
+        for cli_ip in wg_client_ips:          # 遍历两个 WG-client IP
+            for _ in range(phone_per_cli):    # 给每个 client 派 5 个手机 IP
+                cursor += 1
+                mobile_ip = int_to_ip(cursor)
+        
+                if len(app_tables.wg_ip_rule.search(ip_from_phone=mobile_ip,ip_to_wg_client=cli_ip)):
+                    continue                                   # 已存在 → 跳过
+        
+                app_tables.wg_ip_rule.add_row(                # 不存在 → 新增
+                    ip_from_phone            = mobile_ip,
+                    ip_to_wg_client          = cli_ip,        
+                    for_key_ip_use_to_wg_16  = ip_to,
+                    info=info_template,
+                )
+        dhcp_start = int_to_ip(ip_to_int(gateway_ip)+1)
+        dhcp_end   = mobile_ip
+        
+        
+
+        # dns 操作 
+        DNSMASQ_CONF = "/etc/dnsmasq.conf"
+        wifi_网卡 = 'enp88s0'
+        系统自带dns_file = "/etc/resolv.conf"
+
+        系统自带dns_conf = """
+            nameserver 127.0.0.1
+                        
+            # A. 全局禁止 NetworkManager 写 resolv.conf
+            # /etc/NetworkManager/conf.d/no-resolv.conf （新建）
+                                    
+            # [main]
+            # dns=none
+                        
+            
+            # B. 重启 NetworkManager
+            # systemctl restart NetworkManager
+                        
+            
+        """
+    
+
+        ali_dns = '223.5.5.5' 
+        google_dns = '8.8.8.8'
+        china_dns = '114.114.114.114'
+        ad = '94.140.14.14'
+        use_dns = ali_dns
+        lease_time = "12h"
+        netmask = "255.255.0.0"            
+        
+        dnsmasq_conf = f"""
+            # ===============  自动生成，请勿手工修改  =====================
+            bind-interfaces
+            
+            port=53
+            server={use_dns}
+            listen-address=127.0.0.1
+            
+            
+            # 第一个网卡管理 ===================== ===================== ===================== ===================== =====================
+            listen-address={gateway_ip}
+            interface={wifi_网卡}
+            dhcp-range={dhcp_start},{dhcp_end},{netmask},{lease_time}
+            dhcp-option=3,{gateway_ip}                          # 默认网关
+            dhcp-option=6,{use_dns}                             # DNS服务器
+    
+        """
+
+        first_cmd = f"""
+
+                # 必须优先运行的代码  关闭掉一些应用  影响路由表   调整 mss 头部大小  
+
+                iptables -t mangle -D FORWARD -o w+ -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+                iptables -t mangle -A FORWARD -o w+ -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+
+                
+                # 安装 dnsmasq 创建配置必须要链接网络   
+                # 恢复 DNS 能力
+                # sudo systemctl enable --now systemd-resolved       # 重新开服务
+                # sudo ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf   # 恢复符号链接
+                sudo apt update && sudo apt install -y dnsmasq
+                
+                echo "{dnsmasq_conf}" > {DNSMASQ_CONF}
+
+                
+                #拉起wifi网卡
+                sudo ip addr add {gateway_ip}/{netmask} dev {wifi_网卡}
+                ip link set {wifi_网卡} up
+
+                
+                # 禁用系统自带 使用 dnsmasq 进行路由 移除配置  关键点 上面必须都运行完成才能工作
+                systemctl stop systemd-resolved
+                systemctl disable systemd-resolved
+                sudo systemctl stop dnsmasq
+                echo "{系统自带dns_conf}" > {系统自带dns_file}
+                systemctl restart dnsmasq
+                # systemctl status dnsmasq
+
+
+                # 开始拉起所有的 wg 客户端##################################
+                # 开始拉起所有的 wg 客户端##################################
+                # 开始拉起所有的 wg 客户端##################################
+                # 开始拉起所有的 wg 客户端##################################
+
+                
+        """
+
+        
+        all_ip_rule = list(app_tables.wg_ip_rule.search(for_key_ip_use_to_wg_16=ip_to,ip_to_wg_client= q.not_(None)))
+        all_rule = []
+        for rule_row in all_ip_rule:
+            ip_addr = rule_row['ip_from_phone']
+            use_wg_if_client = rule_row['ip_to_wg_client'].replace('.','_')
+            template = f"""
+                        ip rule list   | grep {ip_addr} | awk '{{print $1}}' | tr -d ':' |xargs -r -I{{}} ip rule del pref {{}}
+                        ip rule add from {ip_addr} lookup {use_wg_if_client}
+
+            """
+            all_rule.append(template)
+
+        # wg 客户端
+        wg_client_lunchs    = "\n\n".join(r['wg_client_conf'] for r in app_tables.wg_conf.search(ip_to=ip_to))
+
+        # 路由表
+        all_rule = "\n\n".join(all_rule)
+
+        # 所有命令
+        txt  = first_cmd + wg_client_lunchs + all_rule
+        
         anvil.media.download(anvil.BlobMedia("text/plain", txt.encode(), "wg_clients.sh"))
 
     def delete_click(self, **event_args):
