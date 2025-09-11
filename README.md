@@ -86,3 +86,7 @@ Anvil has tutorials on:
 The Anvil reference documentation provides comprehensive information on how to use Anvil to build web applications. You can find the documentation [here](https://anvil.works/docs/overview?utm_source=github:app_README).
 
 If you want to get to the basics as quickly as possible, each section of this documentation features a [Quick-Start Guide](https://anvil.works/docs/overview/quickstarts?utm_source=github:app_README).
+
+
+<!-- 启动方式 -->
+/usr/local/python3.9/bin/anvil-app-server --app . --port 58000 --ip 0.0.0.0
