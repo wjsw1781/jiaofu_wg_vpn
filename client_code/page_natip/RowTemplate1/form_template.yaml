@@ -19,5 +19,10 @@ components:
   name: client_down
   properties: {text: 客户端部署}
   type: Button
+- event_bindings: {click: button_1_click}
+  layout_properties: {column: YEWYVD}
+  name: button_1
+  properties: {text: 删除}
+  type: Button
 container: {type: DataRowPanel}
 is_package: true

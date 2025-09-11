@@ -112,8 +112,8 @@ class RowTemplate1(RowTemplate1Template):
         for r in conf_rows:
             delay +=1
 
-            # window.setTimeout(lambda row=r: run_one(row), delay)
-            run_one(dict(r))
+            window.setTimeout(lambda row=r: run_one(row), delay)
+            # run_one(dict(r))
             
 
     def make_conf_click(self, **event_args):
@@ -142,7 +142,6 @@ class RowTemplate1(RowTemplate1Template):
     
             client_ip = int_to_ip(client_ip_int)
             server_ip = int_to_ip(server_ip_int)
-    
             try:
                 server_public_ip = self.server_ips[self.server_ip_index]
                 self.server_ip_index += 1   
@@ -160,7 +159,7 @@ class RowTemplate1(RowTemplate1Template):
             client_conf,server_conf= anvil.server.call('get_wg_server_client_conf',client_ip,server_ip,server_public_ip,ip_from,ip_to,wg_listen_port,RT_table_ID)
     
             row = app_tables.wg_conf.search(wg_server_ip=server_ip)
-    
+
             if len(row):  
                 row =app_tables.wg_conf.get(wg_server_ip=server_ip)
                 row['wg_client_ip']        = client_ip
@@ -219,5 +218,10 @@ class RowTemplate1(RowTemplate1Template):
         ip_to  = self.item['ip_use_to']
         txt    = "\n\n".join(r['wg_client_conf'] for r in app_tables.wg_conf.search(ip_to=ip_to))
         anvil.media.download(anvil.BlobMedia("text/plain", txt.encode(), "wg_clients.sh"))
+
+    def button_1_click(self, **event_args):
+        """This method is called when the button is clicked"""
+        self.item.delete()
+        self.parent.parent.parent.parent.parent.repeating_panel_1.items = app_tables.nat_table.search()
 
 

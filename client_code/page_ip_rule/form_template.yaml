@@ -1,0 +1,27 @@
+components:
+- layout_properties: {slot: sidebar}
+  name: nav_1
+  properties: {}
+  type: form:nav
+- components:
+  - components:
+    - name: repeating_panel_1
+      properties: {item_template: page_ip_rule.RowTemplate3}
+      type: RepeatingPanel
+    layout_properties: {grid_position: 'MXKRLJ,JFRGXA'}
+    name: data_grid_1
+    properties:
+      columns:
+      - {data_key: ip_from_phone, id: EHXLXR, title: ip_from_phone}
+      - {data_key: ip_to_wg_client, id: NALARD, title: ip_to_wg_client}
+      - {data_key: for_key_ip_use_to_wg_16, id: DCTIMT, title: for_key_ip_use_to_wg_16}
+      - {data_key: column_1, id: KYGDAR, title: 修改路由}
+    type: DataGrid
+  layout_properties: {slot: default}
+  name: card_1
+  properties: {role: card}
+  type: ColumnPanel
+container:
+  properties: {html: '@theme:dashboard.html'}
+  type: HtmlTemplate
+is_package: true

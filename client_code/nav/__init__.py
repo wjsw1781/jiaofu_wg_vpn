@@ -13,10 +13,16 @@ class nav(navTemplate):
 
         # Any code you write here will run before the form opens.
 
-    def link_1_click(self, **event_args):
-        """This method is called when the link is clicked"""
+    def button_1_click(self, **event_args):
+        """This method is called when the button is clicked"""
         open_form('page_natip')
 
-    def link_2_click(self, **event_args):
-        """This method is called when the link is clicked"""
+
+    def button_2_click(self, **event_args):
+        """This method is called when the button is clicked"""
         open_form('page_ssh')
+
+
+    def button_3_click(self, **event_args):
+        """This method is called when the button is clicked"""
+        open_form('page_ip_rule')

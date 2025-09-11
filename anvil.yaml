@@ -35,17 +35,34 @@ db_schema:
     - admin_ui: {order: 4, width: 200}
       name: wg_server_public_ip
       type: string
-    - admin_ui: {order: 5, width: 200}
+    - admin_ui: {order: 5, width: 136}
       name: ip_to
       type: string
-    - admin_ui: {order: 6, width: 200}
+    - admin_ui: {order: 6, width: 127}
       name: wg_server_ok
       type: string
-    - admin_ui: {order: 7, width: 200}
+    - admin_ui: {order: 7, width: 269}
       name: wg_client_ok
+      type: string
+    - admin_ui: {order: 8, width: 200}
+      name: ip_rule_phone
       type: string
     server: full
     title: wg_conf
+  wg_ip_rule:
+    client: full
+    columns:
+    - admin_ui: {order: 0, width: 200}
+      name: ip_from_phone
+      type: string
+    - admin_ui: {order: 1, width: 200}
+      name: ip_to_wg_client
+      type: string
+    - admin_ui: {order: 2, width: 200}
+      name: for_key_ip_use_to_wg_16
+      type: string
+    server: full
+    title: wg_ip_rule
 name: Classic 1
 package_name: Classic_1
 runtime_options:

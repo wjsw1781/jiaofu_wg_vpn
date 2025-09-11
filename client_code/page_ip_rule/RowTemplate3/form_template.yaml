@@ -1,0 +1,7 @@
+components:
+- layout_properties: {column: KYGDAR}
+  name: fix_ip_rule
+  properties: {text: 修改路由}
+  type: Button
+container: {type: DataRowPanel}
+is_package: true
