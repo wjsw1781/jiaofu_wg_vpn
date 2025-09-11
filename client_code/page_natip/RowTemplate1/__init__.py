@@ -119,7 +119,7 @@ class RowTemplate1(RowTemplate1Template):
     def make_conf_click(self, **event_args):
         """This method is called when the button is clicked"""
     
-        # 2. 拿到起止 IP
+        # 2.路由表编号  不一样  这个是客户端 这边路由表 一样会导致 ip rule 最后路由到最后一个 200
         RT_table_ID = 200
     
         ip_from = self.item['ip_use_from']
@@ -137,6 +137,7 @@ class RowTemplate1(RowTemplate1Template):
     
     
         while current + 3 <= end and count < max_pairs:
+            RT_table_ID +=1
             client_ip_int = current + 1       # /30 中的第一个可用地址
             server_ip_int = current + 2       # /30 中的第二个可用地址
     
