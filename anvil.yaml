@@ -61,6 +61,9 @@ db_schema:
     - admin_ui: {order: 2, width: 200}
       name: for_key_ip_use_to_wg_16
       type: string
+    - admin_ui: {order: 3, width: 200}
+      name: info
+      type: string
     server: full
     title: wg_ip_rule
 name: Classic 1

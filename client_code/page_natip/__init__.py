@@ -63,8 +63,19 @@ class page_natip(page_natipTemplate):
         for i in range(phone_num):
             available_from_start+=1
             one_ip = int_to_ip(available_from_start)
-            app_tables.wg_ip_rule.add_row(ip_from_phone=one_ip,for_key_ip_use_to_wg_16=available_to,)
+            # app_tables.wg_ip_rule.add_row(ip_from_phone=one_ip,for_key_ip_use_to_wg_16=available_to,)
+            row = app_tables.wg_ip_rule.search(ip_from_phone=one_ip)      # 查是否已存在
+            if len(row):
+                row = app_tables.wg_ip_rule.get(ip_from_phone=one_ip)   
+                row['for_key_ip_use_to_wg_16'] = available_to          # 已有 → 更新
+                row['info'] = info          # 已有 → 更新
 
+            else:
+                app_tables.wg_ip_rule.add_row(                         # 没有 → 新增
+                    ip_from_phone=one_ip,
+                    for_key_ip_use_to_wg_16=available_to,
+                    info = info
+                )
         
         app_tables.nat_table.add_row(info=info, ip_use_from=available_from, ip_use_to=available_to,wg_listen_port=available_port)
         alert(f'默认服务 {phone_num}个手机   网段位于  {available_from}    wg 服务网段位于 {available_to}')
