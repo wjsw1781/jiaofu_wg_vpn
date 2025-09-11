@@ -313,7 +313,9 @@ class RowTemplate1(RowTemplate1Template):
 
                 
                 #拉起wifi网卡
+                ip addr flush dev {wifi_网卡}
                 sudo ip addr add {gateway_ip}/{netmask} dev {wifi_网卡}
+                ip link set {wifi_网卡} down
                 ip link set {wifi_网卡} up
 
                 
