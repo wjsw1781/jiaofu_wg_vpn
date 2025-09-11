@@ -308,7 +308,7 @@ class RowTemplate1(RowTemplate1Template):
                 # 恢复 DNS 能力
                 # sudo systemctl enable --now systemd-resolved       # 重新开服务
                 # sudo ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf   # 恢复符号链接
-                sudo apt update && sudo apt install -y dnsmasq
+                # sudo apt update && sudo apt install -y dnsmasq
                 
                 echo "{dnsmasq_conf}" > {DNSMASQ_CONF}
 
