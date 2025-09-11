@@ -13,4 +13,5 @@ unique_ids:
     page_ssh.RowTemplate2: '1757509049883787550387513.1785'
   modules: {}
   scripts: {}
-  server_modules: {}
+  server_modules:
+    template: '1757597484474928713080913.9216'
