@@ -59,7 +59,7 @@ class page_natip(page_natipTemplate):
 
         # 构造手机 ip  的路由规则 先产生 500 左右 ip 手机 等到 wgclient 实际运行后 开始前端绑定或者接口修改这个表就行
         available_from_start = ip_to_int(available_from)
-        phone_num = 20
+        phone_num = 2
         for i in range(phone_num):
             available_from_start+=1
             one_ip = int_to_ip(available_from_start)

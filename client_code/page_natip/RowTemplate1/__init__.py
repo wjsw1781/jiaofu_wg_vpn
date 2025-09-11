@@ -216,10 +216,11 @@ class RowTemplate1(RowTemplate1Template):
 
     def client_down_click(self, **event_args):
         ip_to  = self.item['ip_use_to']
+        # 构造 hdcp 默认使用 
         txt    = "\n\n".join(r['wg_client_conf'] for r in app_tables.wg_conf.search(ip_to=ip_to))
         anvil.media.download(anvil.BlobMedia("text/plain", txt.encode(), "wg_clients.sh"))
 
-    def button_1_click(self, **event_args):
+    def delete_click(self, **event_args):
         """This method is called when the button is clicked"""
         self.item.delete()
         self.parent.parent.parent.parent.parent.repeating_panel_1.items = app_tables.nat_table.search()
