@@ -127,7 +127,10 @@ def get_wg_server_client_conf(client_ip,server_ip,server_public_ip,ip_from,ip_to
         iptables -t nat -D POSTROUTING -o $wg_MAIN_INTERFACE_server -j MASQUERADE
         iptables -t nat -A POSTROUTING -o $wg_MAIN_INTERFACE_server -j MASQUERADE
         echo "主网卡-------> $wg_MAIN_INTERFACE_server"
-        ip route flush table {wg_table_server}
+        
+        ip -4 route flush table {wg_table_server}
+        ip -6 route flush table {wg_table_server}
+        
         wg-quick down {wg_if_server}
         wg-quick up {wg_if_server}
 
