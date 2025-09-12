@@ -172,6 +172,8 @@ def get_wg_server_client_conf(client_ip,server_ip,server_public_ip,ip_from,ip_to
 def ssh_exec(data_with_cmd):
     import paramiko    ,time,os
     wg_server_public_ip = data_with_cmd["wg_server_public_ip"]
+    wg_server_ip = data_with_cmd["wg_server_ip"]
+    
     cmd = data_with_cmd["wg_server_conf"]
 
     print(f'     ssh root@{wg_server_public_ip}         -------> ',wg_server_public_ip)
@@ -191,9 +193,10 @@ def ssh_exec(data_with_cmd):
     try:
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(hostname=host, port=port,username=user, password=password,timeout=timeout)
-        local_wg_conf = f'./wg_conf/{wg_server_public_ip}.sh'
-        remote_wg_conf = f'/etc/wireguard/{wg_server_public_ip}.sh'
+        local_wg_conf = f'./wg_conf/{wg_server_ip}.sh'
+        remote_wg_conf = f'/etc/wireguard/{wg_server_ip}.sh'
         os.makedirs(os.path.dirname(local_wg_conf), exist_ok=True)
+        
         with open(local_wg_conf,'w') as f:
             f.write(cmd)
 
