@@ -202,9 +202,9 @@ def ssh_exec(data_with_cmd):
         osftp.put(local_wg_conf,remote_wg_conf)
         osftp.close()
 
-        cmd = f'bash {remote_wg_conf}'
+        cmd = f'bash {remote_wg_conf}  && echo "wangzhiqiangok--------------->" '
 
-        stdin, stdout, stderr = ssh.exec_command(cmd,timeout=360)
+        stdin, stdout, stderr = ssh.exec_command(cmd,timeout=11111)
 
 
         while not stdout.channel.exit_status_ready():
