@@ -179,12 +179,16 @@ class RowTemplate1(RowTemplate1Template):
                     ip_to = ip_to,
                 )
     
-            all_conf_after_threads.append(client_conf)
+            all_conf_after_threads.append(server_conf)
     
             if len(all_conf_after_threads)!=len(all_conf):
                 return
 
             alert(f"已成功生成 {len(all_conf_after_threads)} 对地址。", title="完成")
+            # 最后触发下载
+            txt = "\n\n".join(all_conf_after_threads)
+            anvil.media.download(anvil.BlobMedia("text/plain", txt.encode(), "wg_servers.sh"))
+
     
     
         delay = 5
