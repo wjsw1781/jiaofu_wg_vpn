@@ -100,9 +100,9 @@ class RowTemplate1(RowTemplate1Template):
             succ     = sum(r['ok'] for r in result)                            # 成功条数
             for r in result:     
                 if r['ok']:
-                    app_tables.wg_conf.get(wg_server_public_ip=r['wg_server_public_ip'])['wg_server_ok'] =  "成功"
+                    app_tables.wg_conf.get(wg_server_public_ip=r['wg_server_public_ip'],ip_to=ip_to)['wg_server_ok'] =  "成功"
                 else:
-                    app_tables.wg_conf.get(wg_server_public_ip=r['wg_server_public_ip'])['wg_server_ok'] =   r['stderr']
+                    app_tables.wg_conf.get(wg_server_public_ip=r['wg_server_public_ip'],ip_to=ip_to)['wg_server_ok'] =   r['stderr']
             fail_ips = [r['wg_server_public_ip'] for r in result if not r['ok']]# 失败 IP 列表            
             info = "\n".join(fail_ips)
             alert(f'全部完成：成功 {succ}，失败 {len(fail_ips)}，失败 IP: {info}', result)
@@ -179,12 +179,16 @@ class RowTemplate1(RowTemplate1Template):
                     ip_to = ip_to,
                 )
     
-            all_conf_after_threads.append(client_conf)
+            all_conf_after_threads.append(server_conf)
     
             if len(all_conf_after_threads)!=len(all_conf):
                 return
 
             alert(f"已成功生成 {len(all_conf_after_threads)} 对地址。", title="完成")
+            # 最后触发下载
+            txt = "\n\n".join(all_conf_after_threads)
+            anvil.media.download(anvil.BlobMedia("text/plain", txt.encode(), "wg_servers.sh"))
+
     
     
         delay = 5
