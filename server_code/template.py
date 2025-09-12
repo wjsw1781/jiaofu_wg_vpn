@@ -110,11 +110,11 @@ def get_wg_server_client_conf(client_ip,server_ip,server_public_ip,ip_from,ip_to
           apt-get update &&   sudo apt-get install -y --no-install-recommends  wireguard-dkms wireguard-tools
         fi
 
-        # 关闭所有 wg 进程 防止端口冲突 起不来wg 进程 清理路由表  路由规则 保持干净环境
-        wg show interfaces | xargs -n 1 |xargs -n1 wg-quick down
-        sed -i '/10.*$/d' /etc/iproute2/rt_tables
-        sed -i '/^$/d' /etc/iproute2/rt_tables
-        ip rule list | grep -v -E "lookup (local|main|default)" | awk '{{print $1}}' | tr -d ':' | xargs -I {{}} ip rule del pref {{}}
+        # 关闭所有 wg 进程 防止端口冲突 起不来wg 进程 清理路由表  路由规则 保持干净环境  正式环境不用 因为一个节点要供很多minipc 每个 minipc 一个端口 port进行使用
+        # wg show interfaces | xargs -n 1 |xargs -n1 wg-quick down
+        # sed -i '/10.*$/d' /etc/iproute2/rt_tables
+        # sed -i '/^$/d' /etc/iproute2/rt_tables
+        # ip rule list | grep -v -E "lookup (local|main|default)" | awk '{{print $1}}' | tr -d ':' | xargs -I {{}} ip rule del pref {{}}
 
         echo "{server_conf}" > {wg_conf_file_server}
 
