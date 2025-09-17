@@ -372,6 +372,12 @@ class RowTemplate1(RowTemplate1Template):
     def delete_click(self, **event_args):
         """This method is called when the button is clicked"""
         self.item.delete()
+        ip_use_to = self.item['ip_use_to']
+        need_delete = app_tables.wg_conf.search(ip_to=ip_use_to)
+        if need_delete:
+            for row in need_delete:
+                row.delete()
+            
         self.parent.parent.parent.parent.parent.repeating_panel_1.items = app_tables.nat_table.search()
 
 
