@@ -27,6 +27,7 @@ components:
         - {data_key: column_1, expand: false, id: SNHWAH, title: 产生配置, width: 111.9765625}
         - {data_key: column_1, expand: false, id: FVZPDX, title: 服务器部署, width: 187.96875}
         - {data_key: column_1, expand: false, id: NPRMNV, title: 客户端部署, width: 155.48046875}
+        - {data_key: wg_listen_port, id: HLDDDY, title: wg_listen_port}
         spacing_above: medium
         spacing_below: medium
       type: DataGrid

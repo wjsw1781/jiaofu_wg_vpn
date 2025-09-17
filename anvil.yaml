@@ -66,8 +66,8 @@ db_schema:
       type: string
     server: full
     title: wg_ip_rule
-name: Classic 1
-package_name: Classic_1
+name: wg_批量部署
+package_name: wg_____
 runtime_options:
   client_version: '3'
   server_spec: {base: python310-minimal}
