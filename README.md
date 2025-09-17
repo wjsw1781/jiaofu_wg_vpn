@@ -93,3 +93,6 @@ If you want to get to the basics as quickly as possible, each section of this do
 
 
 nohup /usr/local/python3.9/bin/anvil-app-server --app . --port 58000 --ip 0.0.0.0 >/dev/null 2>&1 &
+
+
+pkill -f anvil-app-server
