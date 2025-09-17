@@ -307,6 +307,10 @@ class RowTemplate1(RowTemplate1Template):
                 iptables -t mangle -D FORWARD -o w+ -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
                 iptables -t mangle -A FORWARD -o w+ -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
 
+                iptables -t mangle -D FORWARD -o 10_+ -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+                iptables -t mangle -D FORWARD -i 10_+ -p tcp --tcp-flags SYN,RST SYN  -j TCPMSS --clamp-mss-to-pmtu
+                iptables -t mangle -A FORWARD -o 10_+ -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+                iptables -t mangle -A FORWARD -i 10_+ -p tcp --tcp-flags SYN,RST SYN  -j TCPMSS --clamp-mss-to-pmtu
                 
                 # 安装 dnsmasq 创建配置必须要链接网络   
                 # 恢复 DNS 能力
