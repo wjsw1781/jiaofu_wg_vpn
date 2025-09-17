@@ -5,7 +5,7 @@ components:
       - name: repeating_panel_1
         properties: {item_template: page_ssh.RowTemplate2}
         type: RepeatingPanel
-      layout_properties: {grid_position: 'TSUVUQ,ESUQPP'}
+      layout_properties: {full_width_row: true, grid_position: 'TSUVUQ,ESUQPP'}
       name: data_grid_1
       properties:
         columns:
@@ -13,6 +13,7 @@ components:
         - {data_key: wg_server_public_ip, id: RCVILO, title: wg_server_public_ip}
         - {data_key: wg_server_ok, id: ROJQDZ, title: wg_server_ok}
         - {data_key: column_1, id: PNNXIF, title: ssh}
+        - {data_key: ip_to, id: CVBPOZ, title: ip_to}
       type: DataGrid
     layout_properties: {full_width_row: true, grid_position: 'QFAAUV,BCRCSQ'}
     name: card_1
