@@ -2,7 +2,7 @@ components:
 - event_bindings: {click: make_conf_click}
   layout_properties: {column: SNHWAH}
   name: make_conf
-  properties: {text: 产生配置}
+  properties: {text: 产生服务器配置}
   type: Button
 - event_bindings: {change: file_loader_1_change}
   layout_properties: {column: TIKREY}
