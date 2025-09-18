@@ -31,9 +31,16 @@ class page_natip(page_natipTemplate):
 
     def button_1_click(self, **event_args):
         """This method is called when the button is clicked"""
+        # 根据历史数据 找出可用的端口号 可用的网段  
         info = self.info.text
+        rt_table_id_from = self.rt_table_id_from.text
+        minipc_wifi_iplink_name = self.minipc_wifi_iplink_name.text or ""
+        
+        
+        
         used_ip_froms = []
         used_ports =[]
+        
         for r in app_tables.nat_table.search():
             used_ip_froms.append(r['ip_use_from'])
             used_ip_froms.append(r['ip_use_to'])
@@ -57,20 +64,33 @@ class page_natip(page_natipTemplate):
         while available_port in used_ports:
             available_port += 1  
 
-        # 构造手机 路由规则 只要一个就行了 
+            
+        # 增加这个业务的元信息
+        app_tables.nat_table.add_row(info=info, 
+                                     ip_use_from=available_from,
+                                     ip_use_to=available_to,
+                                     wg_listen_port=available_port,
+                                     minipc_wifi_iplink_name= minipc_wifi_iplink_name,
+                                     rt_table_id_from = rt_table_id_from
+                                    )
+
+
+        # 构造手机------> 路由规则表 只要一个就行了 路由规则会通过路由规则自己控制 1 拖5 
         row = app_tables.wg_ip_rule.search(ip_from_phone=available_from)      # 查是否已存在
         if len(row):
             row = app_tables.wg_ip_rule.get(ip_from_phone=available_from)   
             row['for_key_ip_use_to_wg_16'] = available_to          # 已有 → 更新
             row['info'] = info          # 已有 → 更新
-
         else:
             app_tables.wg_ip_rule.add_row(                         # 没有 → 新增
                 ip_from_phone=available_from,
                 for_key_ip_use_to_wg_16=available_to,
                 info = info
             )
-        
-        app_tables.nat_table.add_row(info=info, ip_use_from=available_from, ip_use_to=available_to,wg_listen_port=available_port)
+
         alert(f'网段划分完成  手机网段  {available_from}    wg 服务网段位于 {available_to}')
         self.repeating_panel_1.items = app_tables.nat_table.search() 
+
+    def minipc_wifi_iplink_name_pressed_enter(self, **event_args):
+        """This method is called when the user presses Enter in this text box"""
+        pass

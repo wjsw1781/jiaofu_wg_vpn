@@ -15,18 +15,24 @@ db_schema:
     - admin_ui: {order: 3, width: 200}
       name: wg_listen_port
       type: number
+    - admin_ui: {order: 4, width: 200}
+      name: minipc_wifi_iplink_name
+      type: string
+    - admin_ui: {order: 5, width: 200}
+      name: rt_table_id_from
+      type: string
     server: full
     title: nat_table
   wg_conf:
     client: full
     columns:
-    - admin_ui: {order: 0, width: 200}
+    - admin_ui: {order: 0, width: 122}
       name: wg_server_ip
       type: string
-    - admin_ui: {order: 1, width: 116}
+    - admin_ui: {order: 1, width: 90}
       name: wg_client_ip
       type: string
-    - admin_ui: {order: 2, width: 185}
+    - admin_ui: {order: 2, width: 85}
       name: wg_server_conf
       type: string
     - admin_ui: {order: 3, width: 200}
@@ -46,6 +52,9 @@ db_schema:
       type: string
     - admin_ui: {order: 8, width: 200}
       name: ip_rule_phone
+      type: string
+    - admin_ui: {order: 9, width: 200}
+      name: minipc_wifi_iplink_name
       type: string
     server: full
     title: wg_conf

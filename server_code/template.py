@@ -3,34 +3,62 @@ import anvil.tables.query as q
 from anvil.tables import app_tables
 import anvil.server
 
+import random,string,time
+_ip_keys_memory = {}
+
+def get_公私钥_memory_service(ip):
+    """
+    内存服务 dict 随机的服务
+    返回的结构与原函数一致，但公私钥是随机生成的字符串，不涉及文件写入。
+    """
+    time.sleep(3)
+    if ip in _ip_keys_memory:
+        return _ip_keys_memory[ip]
+
+    # 随机生成私钥 (模拟 wg genkey)
+    # 这里我们生成一个长度为44的随机字符串，包含大小写字母和数字，以模拟Base64编码的格式
+    priv = ''.join(random.choices(string.ascii_letters + string.digits + '+/=', k=44)) + '='
+
+    # 随机生成公钥 (模拟 wg pubkey)
+    # 这里我们生成一个长度为44的随机字符串，包含大小写字母和数字，以模拟Base64编码的格式
+    pub = ''.join(random.choices(string.ascii_letters + string.digits + '+/=', k=44)) + '='
+
+    _ip_keys_memory[ip] = {'public': pub, 'private': priv}
+
+    return _ip_keys_memory[ip]
+
 def get_公私钥(ip):
     import os ,json ,subprocess,pathlib
     file_name = '/root/socks_ss_gfw_ss_socks/linux_透明代理_多路组网_子网划分/all_ip_pubkey_prikey.json'
-    if not os.path.isfile(file_name):
+    try:
+        if not os.path.isfile(file_name):
+            with open(file_name, 'w') as fp:
+                fp.write('{}')    
+    
+        with open(file_name, 'r') as fp:
+            try:
+                ip_keys = json.load(fp) or {}
+            except json.JSONDecodeError:
+                ip_keys = {}
+    
+        if ip in ip_keys:
+            return ip_keys[ip]
+    
+        priv = subprocess.check_output(['wg', 'genkey']).strip().decode()
+        pub  = subprocess.check_output(['wg', 'pubkey'], input=priv.encode()).strip().decode()
+        ip_keys[ip] = {'public': pub, 'private': priv}
+    
         with open(file_name, 'w') as fp:
-            fp.write('{}')    
+            json.dump(ip_keys, fp, indent=4)
 
-    with open(file_name, 'r') as fp:
-        try:
-            ip_keys = json.load(fp) or {}
-        except json.JSONDecodeError:
-            ip_keys = {}
-
-    if ip in ip_keys:
         return ip_keys[ip]
-
-    priv = subprocess.check_output(['wg', 'genkey']).strip().decode()
-    pub  = subprocess.check_output(['wg', 'pubkey'], input=priv.encode()).strip().decode()
-    ip_keys[ip] = {'public': pub, 'private': priv}
-
-    with open(file_name, 'w') as fp:
-        json.dump(ip_keys, fp, indent=4)
-
-    return ip_keys[ip]
+    except Exception as e :
+        return get_公私钥_memory_service(ip)
 
 
 
-# 产生配置
+
+# 产生配置  服务端配置 客户端配置都产生
 @anvil.server.callable
 def get_wg_server_client_conf(client_ip,server_ip,server_public_ip,ip_from,ip_to,wg_listen_port,RT_table_ID):
     prefixlen = 30
@@ -110,11 +138,24 @@ def get_wg_server_client_conf(client_ip,server_ip,server_public_ip,ip_from,ip_to
           apt-get update &&   sudo apt-get install -y --no-install-recommends  wireguard-dkms wireguard-tools
         fi
 
-        # 关闭所有 wg 进程 防止端口冲突 起不来wg 进程 清理路由表  路由规则 保持干净环境  正式环境不用 因为一个节点要供很多minipc 每个 minipc 一个端口 port进行使用
-        # wg show interfaces | xargs -n 1 |xargs -n1 wg-quick down
-        # sed -i '/10.*$/d' /etc/iproute2/rt_tables
-        # sed -i '/^$/d' /etc/iproute2/rt_tables
-        # ip rule list | grep -v -E "lookup (local|main|default)" | awk '{{print $1}}' | tr -d ':' | xargs -I {{}} ip rule del pref {{}}
+        PORT_IN_USE=$(wg show all dump | awk '{{print $4}}' | grep -w "{ListenPort}")
+
+        if [ -n "$PORT_IN_USE" ]; then
+            echo "WARN: WireGuard ListenPort {ListenPort} 已被其他 WG 接口占用。正在关闭所有 WG 接口以避免冲突..."
+            # 关闭所有 wg 进程 防止端口冲突 起不来wg 进程 清理路由表 路由规则 保持干净环境
+            # 这里使用 wg show interfaces 获取所有接口名，然后逐个执行 wg-quick down
+            wg show interfaces | xargs -n 1 | xargs -n 1 wg-quick down
+            
+            echo "所有 WireGuard 接口已关闭。"
+            # wg show interfaces | xargs -n 1 |xargs -n1 wg-quick down
+            # sed -i '/10.*$/d' /etc/iproute2/rt_tables
+            # sed -i '/^$/d' /etc/iproute2/rt_tables
+            # ip rule list | grep -v -E "lookup (local|main|default)" | awk '{{print $1}}' | tr -d ':' | xargs -I {{}} ip rule del pref {{}}
+
+        else
+            echo "WireGuard ListenPort {ListenPort} 未被占用，可以正常启动。"
+        fi
+
 
         echo "{server_conf}" > {wg_conf_file_server}
 

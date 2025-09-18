@@ -120,11 +120,18 @@ class RowTemplate1(RowTemplate1Template):
         """This method is called when the button is clicked"""
     
         # 2.路由表编号  不一样  这个是客户端 这边路由表 一样会导致 ip rule 最后路由到最后一个 200
-        RT_table_ID = 200
     
         ip_from = self.item['ip_use_from']
         ip_to   = self.item['ip_use_to']
         wg_listen_port =self.item['wg_listen_port']
+        rt_table_id_from =self.item['rt_table_id_from']
+        minipc_wifi_iplink_name = self.item['minipc_wifi_iplink_name']
+
+        
+        RT_table_ID = int(rt_table_id_from)
+
+
+        
         max_pairs  = 2000
     
         start = ip_to_int(ip_to)
@@ -182,6 +189,7 @@ class RowTemplate1(RowTemplate1Template):
             all_conf_after_threads.append(server_conf)
     
             if len(all_conf_after_threads)!=len(all_conf):
+                Notification(f'业务创建导致的服务端客户端配置创建并写表----进度----{len(all_conf_after_threads)}/{len(all_conf)}').show()
                 return
 
             alert(f"已成功生成 {len(all_conf_after_threads)} 对地址。", title="完成")
@@ -194,12 +202,12 @@ class RowTemplate1(RowTemplate1Template):
         delay = 5
         for r in all_conf:
             window.setTimeout(lambda row=r: thread_run_one_conf(row), delay)
-            delay +=1
+            delay +=5
 
             
     def file_loader_1_change(self, file, **event_args):
 
-            # 读取 CSV 内容（假设是 UTF-8；否则先 file.content_type 判断再选编码）
+        # 读取 CSV 内容（假设是 UTF-8；否则先 file.content_type 判断再选编码）
         text = file.get_bytes().decode('utf-8', errors='ignore')
 
         # ② 调我们自己写的 parse_csv
@@ -221,6 +229,8 @@ class RowTemplate1(RowTemplate1Template):
 
     def client_down_click(self, **event_args):
         ip_to  = self.item['ip_use_to']
+        minipc_wifi_iplink_name = self.item['minipc_wifi_iplink_name']
+        
         wg_client_ips    = [r['wg_client_ip'] for r in app_tables.wg_conf.search(ip_to=ip_to)]
         # 扩充手机路由规则    获取所有 client ip 进行扩充 一对 5 占用补充 phone 手机 ip 准备 ip范围   
         
@@ -233,7 +243,7 @@ class RowTemplate1(RowTemplate1Template):
         gateway_ip  = int_to_ip(cursor)
         
         info_template = now_phone[0]['info']
-        for cli_ip in wg_client_ips:          # 遍历两个 WG-client IP
+        for index,cli_ip in enumerate(wg_client_ips):          # 遍历两个 WG-client IP
             for _ in range(phone_per_cli):    # 给每个 client 派 5 个手机 IP
                 cursor += 1
                 mobile_ip = int_to_ip(cursor)
@@ -247,6 +257,7 @@ class RowTemplate1(RowTemplate1Template):
                     for_key_ip_use_to_wg_16  = ip_to,
                     info=info_template,
                 )
+            Notification(f"进度------> 构造客户端wg_ip 负载 ip rule  {index}/{len(wg_client_ips)}").show()
         dhcp_start = int_to_ip(ip_to_int(gateway_ip)+1)
         dhcp_end   = mobile_ip
         
@@ -254,7 +265,7 @@ class RowTemplate1(RowTemplate1Template):
 
         # dns 操作 
         DNSMASQ_CONF = "/etc/dnsmasq.conf"
-        wifi_网卡 = 'enp3s0'
+        wifi_网卡 = minipc_wifi_iplink_name or  'enp3s0'
         系统自带dns_file = "/etc/resolv.conf"
 
         系统自带dns_conf = """
@@ -377,6 +388,9 @@ class RowTemplate1(RowTemplate1Template):
         self.parent.parent.parent.parent.parent.repeating_panel_1.items = app_tables.nat_table.search()
 
         need_delete = app_tables.wg_conf.search(ip_to=ip_use_to)
-        for row in need_delete:
-            row.delete()
+        need_delete_num = len(need_delete)
+        
+        for index, line in enumerate(need_delete):
+            Notification(f'业务删除引发配置删除----进度----{index}/{need_delete_num}').show()
+            line.delete()
 
