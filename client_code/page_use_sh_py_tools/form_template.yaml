@@ -1,8 +1,9 @@
 components:
 - components:
   - components:
-    - layout_properties: {grid_position: 'MJJVVJ,HDKXOH'}
-      name: button_8
+    - event_bindings: {click: make_91_click}
+      layout_properties: {grid_position: 'MJJVVJ,HDKXOH'}
+      name: make_91
       properties: {text: 创建 91}
       type: Button
     - layout_properties: {grid_position: 'MJJVVJ,JQKOQO'}
