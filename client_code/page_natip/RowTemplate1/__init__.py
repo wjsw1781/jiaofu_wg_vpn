@@ -297,7 +297,8 @@ class RowTemplate1(RowTemplate1Template):
             alert("CSV 文件中未找到合法的公网 IP！")
             return
         
-        alert("\n" )
+        alert("获取到的公网 ip---->"+"\n".join(ips) )
+        
         self.server_ips = ips       # 保存到 form 的实例变量
         self.server_ip_index = 0    # 当前已分配到第几个
         
