@@ -12,8 +12,9 @@ components:
         - {data_key: wg_server_ip, id: KEJNHS, title: wg_server_ip}
         - {data_key: wg_server_public_ip, id: RCVILO, title: wg_server_public_ip}
         - {data_key: wg_server_ok, id: ROJQDZ, title: wg_server_ok}
-        - {data_key: column_1, id: PNNXIF, title: ssh}
         - {data_key: ip_to, id: CVBPOZ, title: ip_to}
+        - {data_key: minipc_wifi_iplink_name, id: ZUUQIR, title: minipc_wifi_iplink_name}
+        - {data_key: wg_listen_port, id: QCHUEQ, title: wg_listen_port}
       type: DataGrid
     layout_properties: {full_width_row: true, grid_position: 'QFAAUV,BCRCSQ'}
     name: card_1

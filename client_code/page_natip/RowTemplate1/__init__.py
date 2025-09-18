@@ -175,6 +175,8 @@ class RowTemplate1(RowTemplate1Template):
                 row['wg_client_conf']      = client_conf
                 row['wg_server_public_ip'] = server_public_ip
                 row['ip_to'] = ip_to
+                row['minipc_wifi_iplink_name'] = minipc_wifi_iplink_name
+                
     
             else:                                                 # 不存在 → 新增
                 app_tables.wg_conf.add_row(
@@ -184,6 +186,7 @@ class RowTemplate1(RowTemplate1Template):
                     wg_client_conf      = client_conf,
                     wg_server_public_ip = server_public_ip,
                     ip_to = ip_to,
+                    minipc_wifi_iplink_name =minipc_wifi_iplink_name,
                 )
     
             all_conf_after_threads.append(server_conf)

@@ -24,5 +24,9 @@ components:
   name: delete
   properties: {text: 删除}
   type: Button
+- layout_properties: {column: VSXSPD}
+  name: acc_wg_client_use_server_ip
+  properties: {text: 加速客户端}
+  type: Button
 container: {type: DataRowPanel}
 is_package: true
