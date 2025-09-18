@@ -5,6 +5,59 @@ import anvil.tables as tables
 import anvil.tables.query as q
 from anvil.tables import app_tables
 from anvil.js import window 
+
+
+import time
+
+def list_of_dicts_to_csv_string_readable(data: list[dict]) -> str:
+    """
+    将 list[dict] 数据转换为 CSV 字符串，自动推断列名，并处理 CSV 编码。
+    适用于 Anvil 纯客户端环境。
+    """
+    if not data:
+        return "" # 处理空数据列表的情况
+
+    # 1. 动态获取列名 (从第一个字典的键)
+    column_names = list(data[0].keys())
+
+    # 2. 生成 CSV 头部行
+    header_parts = []
+    for col_name in column_names:
+        # 字段值中的双引号替换为两个双引号
+        escaped_col_name = col_name.replace('"', '""')
+        # 用双引号包裹整个字段
+        header_parts.append(f'"{escaped_col_name}"')
+    header_row = ",".join(header_parts)
+
+    # 3. 生成所有数据行
+    csv_data_rows = []
+    for row_dict in data:
+        row_parts = []
+        for col_name in column_names:
+            value = row_dict.get(col_name) # 安全获取值
+
+            # 处理 None 值，转换为字符串
+            if value is None:
+                value_str = ""
+            else:
+                value_str = str(value)
+
+            # 处理值中的双引号 (替换为两个双引号)
+            escaped_value_str = value_str.replace('"', '""')
+
+            # 如果值包含逗号、双引号或换行符，则用双引号包裹整个字段
+            # 注意：此处我们假定值中不包含换行符，且已将所有双引号转义
+            # 如果值中可能包含逗号，则始终包裹是更安全的做法。
+            # 为了简化，我们只处理了双引号转义，并假定所有字段都用双引号包裹，
+            # 这样对于大多数情况都有效，且简单。
+            field = f'"{escaped_value_str}"'
+            row_parts.append(field)
+
+        csv_data_rows.append(",".join(row_parts))
+
+    # 4. 组合头部和数据行
+    return header_row + "\n" + "\n".join(csv_data_rows)
+
 def ip_to_int(ip_str):
     """
   '10.0.0.1'  ->  167772161
@@ -83,6 +136,8 @@ class RowTemplate1(RowTemplate1Template):
         self.init_components(**properties)
 
         # Any code you write here will run before the form opens.
+        self.server_ip_index = 0 
+        self.server_ips =[]
 
     def ssh_run_click(self, **event_args):
         """This method is called when the button is clicked"""
@@ -120,6 +175,9 @@ class RowTemplate1(RowTemplate1Template):
         """This method is called when the button is clicked"""
     
         # 2.路由表编号  不一样  这个是客户端 这边路由表 一样会导致 ip rule 最后路由到最后一个 200
+        if self.server_ips ==[]:
+            alert("请上传该业务的节点文件 才能进行后续配置")
+            return
     
         ip_from = self.item['ip_use_from']
         ip_to   = self.item['ip_use_to']
@@ -162,6 +220,7 @@ class RowTemplate1(RowTemplate1Template):
             count   += 1
     
         def thread_run_one_conf(one_conf):
+            
             client_ip,server_ip,server_public_ip,ip_from,ip_to,wg_listen_port,RT_table_ID = one_conf
     
             client_conf,server_conf= anvil.server.call('get_wg_server_client_conf',client_ip,server_ip,server_public_ip,ip_from,ip_to,wg_listen_port,RT_table_ID)
@@ -175,8 +234,11 @@ class RowTemplate1(RowTemplate1Template):
                 row['wg_client_conf']      = client_conf
                 row['wg_server_public_ip'] = server_public_ip
                 row['ip_to'] = ip_to
-    
+                row['minipc_wifi_iplink_name'] = minipc_wifi_iplink_name
+                row['wg_listen_port'] =  str(wg_listen_port)
+                
             else:                                                 # 不存在 → 新增
+                
                 app_tables.wg_conf.add_row(
                     wg_server_ip        = server_ip,
                     wg_client_ip        = client_ip,
@@ -184,25 +246,37 @@ class RowTemplate1(RowTemplate1Template):
                     wg_client_conf      = client_conf,
                     wg_server_public_ip = server_public_ip,
                     ip_to = ip_to,
+                    minipc_wifi_iplink_name =minipc_wifi_iplink_name,
+                    wg_listen_port = str(wg_listen_port),
                 )
     
             all_conf_after_threads.append(server_conf)
     
             if len(all_conf_after_threads)!=len(all_conf):
-                Notification(f'业务创建导致的服务端客户端配置创建并写表----进度----{len(all_conf_after_threads)}/{len(all_conf)}').show()
                 return
 
-            alert(f"已成功生成 {len(all_conf_after_threads)} 对地址。", title="完成")
             # 最后触发下载
-            txt = "\n\n".join(all_conf_after_threads)
-            anvil.media.download(anvil.BlobMedia("text/plain", txt.encode(), "wg_servers.sh"))
+            datas_conf =   list(app_tables.wg_conf.search(ip_to=ip_to))
+            datas_conf = list(map(lambda x : dict(x) ,datas_conf ))
+            txt = list_of_dicts_to_csv_string_readable(datas_conf)
+
+            alert(f"已成功生成 {len(all_conf_after_threads)} 对地址。", title="完成")
+
+            anvil.media.download(anvil.BlobMedia("text/csv", txt.encode(), "wg_conf.csv"))
 
     
     
         delay = 5
-        for r in all_conf:
+        for index , r in enumerate(all_conf):
             window.setTimeout(lambda row=r: thread_run_one_conf(row), delay)
-            delay +=5
+            delay +=5 
+            Notification(f'业务创建导致的服务端客户端配置创建并写表----进度---- {index}   / {len(all_conf)}').show()
+            time.sleep(1)
+            
+
+
+            
+
 
             
     def file_loader_1_change(self, file, **event_args):
@@ -222,6 +296,8 @@ class RowTemplate1(RowTemplate1Template):
         if not ips:
             alert("CSV 文件中未找到合法的公网 IP！")
             return
+        
+        alert("\n" )
         self.server_ips = ips       # 保存到 form 的实例变量
         self.server_ip_index = 0    # 当前已分配到第几个
         

@@ -1,7 +1,3 @@
-components:
-- layout_properties: {column: PNNXIF}
-  name: button_1
-  properties: {text: ssh}
-  type: Button
+components: []
 container: {type: DataRowPanel}
 is_package: true
