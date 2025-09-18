@@ -1,0 +1,71 @@
+components:
+- components:
+  - components:
+    - layout_properties: {grid_position: 'MJJVVJ,HDKXOH'}
+      name: button_8
+      properties: {text: 创建 91}
+      type: Button
+    - layout_properties: {grid_position: 'MJJVVJ,JQKOQO'}
+      name: button_1
+      properties: {text: 常驻保活节点}
+      type: Button
+    - layout_properties: {grid_position: 'MJJVVJ,SZBXBO'}
+      name: button_2
+      properties: {text: 路由转发中继}
+      type: Button
+    - layout_properties: {grid_position: 'MJJVVJ,LERALI'}
+      name: button_3
+      properties: {text: 防火墙指南}
+      type: Button
+    - layout_properties: {grid_position: 'MJJVVJ,KKJPRM'}
+      name: button_4
+      properties: {text: ip rule}
+      type: Button
+    - layout_properties: {grid_position: 'MJJVVJ,VAPKLN'}
+      name: button_5
+      properties: {text: 内网代理}
+      type: Button
+    - layout_properties: {grid_position: 'MJJVVJ,FQDKWL'}
+      name: button_6
+      properties: {text: quic}
+      type: Button
+    - layout_properties: {grid_position: 'MJJVVJ,QHTWCK'}
+      name: button_7
+      properties: {text: tun2socks}
+      type: Button
+    layout_properties: {full_width_row: true, grid_position: 'WBFIAN,AMOEMZ'}
+    name: card_1
+    properties: {col_widths: '{"JQKOQO":9,"SZBXBO":9,"LERALI":9,"KKJPRM":9,"VAPKLN":8,"FQDKWL":6,"QHTWCK":10}', role: card}
+    type: ColumnPanel
+  - components:
+    - components:
+      - name: repeating_panel_1
+        properties: {item_template: page_use_sh_py_tools.RowTemplate4}
+        type: RepeatingPanel
+      layout_properties: {full_width_row: true, grid_position: 'SGBVGL,SKGWIO'}
+      name: data_grid_1
+      properties:
+        columns:
+        - {data_key: zuwang_server_ip, id: YONBIU, title: zuwang_server_ip}
+        - {data_key: zuwang_client_ip, id: IJDCPS, title: zuwang_client_ip}
+        - {data_key: zuwang_online, id: KUSIZU, title: zuwang_online}
+        - {data_key: column_1, id: XPDXCK, title: 下载常驻保活_节点命令}
+        - {data_key: column_1, id: WFKCJJ, title: 标记分配}
+        - {data_key: have_give, id: BMBEJS, title: have_give}
+      type: DataGrid
+    layout_properties: {full_width_row: true, grid_position: 'YJWJYO,XKVBHE'}
+    name: card_2
+    properties: {role: card}
+    type: ColumnPanel
+  layout_properties: {slot: default}
+  name: content_panel
+  properties: {}
+  type: ColumnPanel
+- layout_properties: {slot: sidebar}
+  name: nav_1
+  properties: {}
+  type: form:nav
+container:
+  properties: {html: '@theme:dashboard.html'}
+  type: HtmlTemplate
+is_package: true

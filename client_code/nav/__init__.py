@@ -26,3 +26,9 @@ class nav(navTemplate):
     def button_3_click(self, **event_args):
         """This method is called when the button is clicked"""
         open_form('page_ip_rule')
+
+    def tools_func_click(self, **event_args):
+        """This method is called when the button is clicked"""
+    
+        open_form('page_use_sh_py_tools')
+

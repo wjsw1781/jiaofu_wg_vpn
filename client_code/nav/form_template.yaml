@@ -15,6 +15,11 @@ components:
     name: button_3
     properties: {text: 管理路由}
     type: Button
+  - event_bindings: {click: tools_func_click}
+    layout_properties: {grid_position: 'BFFWXW,IKQNMX'}
+    name: tools_func
+    properties: {text: 管理工具}
+    type: Button
   layout_properties: {grid_position: 'ZIKWED,YNSXUH', row_background: 'theme:Accent 2'}
   name: card_1
   properties: {role: card}

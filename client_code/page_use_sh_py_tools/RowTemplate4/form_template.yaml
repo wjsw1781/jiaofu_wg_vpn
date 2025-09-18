@@ -1,0 +1,11 @@
+components:
+- layout_properties: {column: XPDXCK}
+  name: button_1
+  properties: {text: 下载}
+  type: Button
+- layout_properties: {column: WFKCJJ}
+  name: button_2
+  properties: {text: 标记分配}
+  type: Button
+container: {type: DataRowPanel}
+is_package: true
