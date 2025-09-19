@@ -341,7 +341,8 @@ class RowTemplate1(RowTemplate1Template):
 
         # dns 操作 
         DNSMASQ_CONF = "/etc/dnsmasq.conf"
-        wifi_网卡 = minipc_wifi_iplink_name or  'enp3s0'
+        wifi_网卡 = minipc_wifi_iplink_name or  'enp3s0' 
+        # enp3s0  
         系统自带dns_file = "/etc/resolv.conf"
 
         系统自带dns_conf = """

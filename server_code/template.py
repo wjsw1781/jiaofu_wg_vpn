@@ -237,8 +237,11 @@ def ssh_exec(data_with_cmd):
     try:
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(hostname=host, port=port,username=user, password=password,timeout=timeout)
-        local_wg_conf = f'./wg_conf/{wg_server_ip}.sh'
-        remote_wg_conf = f'/etc/wireguard/{wg_server_ip}.sh'
+
+        wg_server_ip_sh = wg_server_ip.replace(".","_")
+        
+        local_wg_conf = f'./wg_conf/{wg_server_ip_sh}.sh'
+        remote_wg_conf = f'/etc/wireguard/{wg_server_ip_sh}.sh'
         os.makedirs(os.path.dirname(local_wg_conf), exist_ok=True)
         
         with open(local_wg_conf,'w') as f:
