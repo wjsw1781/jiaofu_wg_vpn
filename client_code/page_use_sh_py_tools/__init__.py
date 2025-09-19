@@ -17,7 +17,8 @@ class page_use_sh_py_tools(page_use_sh_py_toolsTemplate):
 
     def make_91_click(self, **event_args):
         """This method is called when the button is clicked"""
-        pass
+        anvil.server.call('make_91_to_anvil')
+        alert('创建成功 91 100 个客户端')
 
     def add_py_click(self, **event_args):
         """This method is called when the button is clicked"""
