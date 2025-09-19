@@ -97,7 +97,7 @@ nohup /usr/local/python3.9/bin/anvil-app-server --app . --port 58000 --ip 0.0.0.
 
 pkill -f anvil-app-server
 
-
+47.97.83.157:58000
 
 
 
