@@ -89,6 +89,10 @@ If you want to get to the basics as quickly as possible, each section of this do
 
 
 <!-- 启动方式 -->
+
+cd /root/socks_ss_gfw_ss_socks/linux_透明代理_多路组网_子网划分/wg_批量部署/jiaofu_wg_vpn
+
+
 /usr/local/python3.9/bin/anvil-app-server --app . --port 58000 --ip 0.0.0.0
 
 
@@ -96,6 +100,7 @@ nohup /usr/local/python3.9/bin/anvil-app-server --app . --port 58000 --ip 0.0.0.
 
 
 pkill -f anvil-app-server
+
 
 47.97.83.157:58000
 
