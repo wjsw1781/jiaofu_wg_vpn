@@ -279,3 +279,18 @@ def ssh_exec(data_with_cmd):
 
     return ret
 
+
+
+@anvil.server.callable
+def make_91_to_anvil():
+    import json
+    file_name = '91_client_script_up.json'
+    with open(file_name,'r') as f:
+        data = json.load(f)
+    for index, i in enumerate(data):
+        py_desc = str(index)
+        py_content = i
+        app_tables.tools_py_str.add_row(
+            info_desc=py_desc,    
+            python_code=py_content
+        )
