@@ -1,0 +1,13 @@
+components:
+- event_bindings: {click: down_py_content_click}
+  layout_properties: {column: TPDZYJ}
+  name: down_py_content
+  properties: {text: 下载}
+  type: Button
+- event_bindings: {click: del_py_click}
+  layout_properties: {column: DWBBUK}
+  name: del_py
+  properties: {text: 删除}
+  type: Button
+container: {type: DataRowPanel}
+is_package: true

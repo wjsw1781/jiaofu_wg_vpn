@@ -40,6 +40,17 @@ db_schema:
       type: string
     server: full
     title: nat_table
+  tools_py_str:
+    client: full
+    columns:
+    - admin_ui: {order: 0, width: 200}
+      name: info_desc
+      type: string
+    - admin_ui: {order: 1, width: 200}
+      name: python_code
+      type: string
+    server: full
+    title: tools_py_str
   wg_conf:
     client: full
     columns:
