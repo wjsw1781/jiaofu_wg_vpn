@@ -1,16 +1,6 @@
 components:
 - components:
   - components:
-    - event_bindings: {click: make_91_click}
-      layout_properties: {grid_position: 'MJJVVJ,HDKXOH'}
-      name: make_91
-      properties: {text: 创建 91}
-      type: Button
-    - event_bindings: {click: down_click}
-      layout_properties: {grid_position: 'MJJVVJ,JQKOQO'}
-      name: down
-      properties: {text: 常驻保活节点}
-      type: Button
     - layout_properties: {grid_position: 'MJJVVJ,SZBXBO'}
       name: button_2
       properties: {text: 路由转发中继}

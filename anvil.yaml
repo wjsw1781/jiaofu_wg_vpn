@@ -1,22 +1,5 @@
 allow_embedding: false
 db_schema:
-  baohuo_node_zuwang:
-    client: none
-    columns:
-    - admin_ui: {order: 0, width: 200}
-      name: zuwang_server_ip
-      type: string
-    - admin_ui: {order: 1, width: 200}
-      name: zuwang_client_ip
-      type: string
-    - admin_ui: {order: 2, width: 200}
-      name: zuwang_online
-      type: string
-    - admin_ui: {order: 3, width: 200}
-      name: have_give
-      type: string
-    server: full
-    title: baohuo_node_zuwang
   nat_table:
     client: full
     columns:
