@@ -316,7 +316,6 @@ class RowTemplate1(RowTemplate1Template):
         cursor         = ip_to_int(now_phone[0]['ip_from_phone'])
         cursor += 1
 
-        # 第一个地址给 wifi 网卡使用  enp88s0
         gateway_ip  = int_to_ip(cursor)
         
         info_template = now_phone[0]['info']
@@ -446,10 +445,26 @@ class RowTemplate1(RowTemplate1Template):
             """
             all_rule.append(template)
 
-        # wg 客户端
-        wg_client_lunchs    = "\n\n".join(r['wg_client_conf'] for r in app_tables.wg_conf.search(ip_to=ip_to))
+        # wg 客户端  拼接命令的同时 吧 sh 也进行保存到/etc/wiregard/*.sh
+        wg_client_lunchs = []
+        for wg_conf_server_client in app_tables.wg_conf.search(ip_to=ip_to):
+            lunch_name =  wg_conf_server_client['wg_client_ip'].replace('.','_')
+            sh_file = f'/etc/wireguard/{lunch_name}.sh'
+            one_wg_client_conf = wg_conf_server_client['wg_client_conf']
 
-        # 路由表
+            save_to_sh_and_shell_raw = f"""
+            cat << 'EOF' > {sh_file}
+            {one_wg_client_conf}
+            EOF
+            
+            bash {sh_file}
+            """
+            wg_client_lunchs.append(save_to_sh_and_shell_raw)
+            
+        # 拉起 wg 客户端
+        wg_client_lunchs    = "\n\n".join(wg_client_lunchs)
+
+        # 路由表配置命令
         all_rule = "\n\n".join(all_rule)
 
         # 所有命令
