@@ -212,7 +212,7 @@ for i in range(need_how_many_client):
 
 
     data_sh_client.append(client_script)
-print(data_sh_client)
+# print(data_sh_client)
 # json dump 到一个文件 
 with open('91_client_script_up.json', 'w') as f:
     json.dump(data_sh_client, f)
