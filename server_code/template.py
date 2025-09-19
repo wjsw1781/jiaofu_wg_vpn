@@ -240,6 +240,9 @@ def ssh_exec(data_with_cmd):
 
         wg_server_ip_sh = wg_server_ip.replace(".","_")
         
+
+
+        # wg 服务端 sh 拉起文件
         local_wg_conf = f'./wg_conf/{wg_server_ip_sh}.sh'
         remote_wg_conf = f'/etc/wireguard/{wg_server_ip_sh}.sh'
         os.makedirs(os.path.dirname(local_wg_conf), exist_ok=True)
