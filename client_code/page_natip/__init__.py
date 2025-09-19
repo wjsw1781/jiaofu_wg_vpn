@@ -61,7 +61,7 @@ class page_natip(page_natipTemplate):
                 available_to = potential_ip_to
                 break # Found an available range, exit loop
                 
-        while available_port in used_ports:
+        while available_port <= max(used_ports):
             available_port += 1  
 
             
