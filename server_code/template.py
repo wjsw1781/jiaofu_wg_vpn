@@ -247,9 +247,15 @@ def ssh_exec(data_with_cmd):
         with open(local_wg_conf,'w') as f:
             f.write(cmd)
 
+        # 保活 py 文件 
+        remote_relunch_file_path = f'/etc/wireguard/{wg_server_ip_sh}.py'
+        local_relunch_file_path = f'/etc/wireguard/relunch_保活_指定节点.py'
+
+
 
         osftp = ssh.open_sftp()
         osftp.put(local_wg_conf,remote_wg_conf)
+        osftp.put(local_relunch_file_path,remote_relunch_file_path)
         osftp.close()
 
         cmd = f'bash {remote_wg_conf}  && echo "wangzhiqiangok--------------->" '
