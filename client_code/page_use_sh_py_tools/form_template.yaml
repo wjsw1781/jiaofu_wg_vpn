@@ -25,6 +25,11 @@ components:
       name: button_7
       properties: {text: tun2socks}
       type: Button
+    - event_bindings: {click: make_91_click}
+      layout_properties: {grid_position: 'MJJVVJ,LSGZWP'}
+      name: make_91
+      properties: {text: '91'}
+      type: Button
     layout_properties: {full_width_row: true, grid_position: 'WBFIAN,AMOEMZ'}
     name: card_1
     properties: {col_widths: '{"JQKOQO":9,"SZBXBO":9,"LERALI":9,"KKJPRM":9,"VAPKLN":8,"FQDKWL":6,"QHTWCK":10}', role: card}
