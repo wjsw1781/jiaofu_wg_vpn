@@ -87,6 +87,7 @@ wg_server_ips= wg_server_ips[2:-2]
 
 process_bar = tqdm(total=need_how_many_client)
 
+data_sh_client = []
 # 生成客户端的配置文件
 for i in range(need_how_many_client):
     process_bar.update(1)
@@ -180,9 +181,7 @@ for i in range(need_how_many_client):
         ip rule add to {wg_ip_client} lookup {wg_table_server}
 
     """
-    os.system(cmd_lunch_wg_server)
-    with open(wg_conf_file_server, "w") as f:
-        f.write(server_conf)
+
 
 
     
@@ -207,12 +206,13 @@ for i in range(need_how_many_client):
 
 
     """
-    with open(f"./wg_clients/{wg_if_client}_client.sh", "w") as f:
-        f.write(client_script)
+    os.system(cmd_lunch_wg_server)
+    with open(f'/etc/wireguard/{wg_if_server}.conf', "w") as f:
+        f.write(cmd_lunch_wg_server)
 
 
-"""
-
-
-
-"""
+    data_sh_client.append(client_script)
+print(data_sh_client)
+# json dump 到一个文件 
+with open('91_client_script_up.json', 'w') as f:
+    json.dump(data_sh_client, f)
