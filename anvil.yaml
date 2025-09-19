@@ -46,7 +46,7 @@ db_schema:
     - admin_ui: {order: 0, width: 122}
       name: wg_server_ip
       type: string
-    - admin_ui: {order: 1, width: 90}
+    - admin_ui: {order: 1, width: 261}
       name: wg_client_ip
       type: string
     - admin_ui: {order: 2, width: 85}
