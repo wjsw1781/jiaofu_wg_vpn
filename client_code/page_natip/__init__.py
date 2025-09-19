@@ -39,7 +39,7 @@ class page_natip(page_natipTemplate):
         
         
         used_ip_froms = []
-        used_ports =[]
+        used_ports =[49999]
         
         for r in app_tables.nat_table.search():
             used_ip_froms.append(r['ip_use_from'])
