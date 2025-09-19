@@ -253,6 +253,8 @@ def ssh_exec(data_with_cmd):
         # 保活 py 文件 
         remote_relunch_file_path = f'/etc/wireguard/{wg_server_ip_sh}.py'
         local_relunch_file_path = f'/etc/wireguard/relunch_保活_指定节点.py'
+        stdin, stdout, stderr = ssh.exec_command("mkdir -p /etc/wireguard",timeout=11111)
+
 
 
 
