@@ -11,10 +11,27 @@ class page_use_sh_py_tools(page_use_sh_py_toolsTemplate):
         # Set Form properties and Data Bindings.
         self.init_components(**properties)
 
+        self.repeating_panel_1.items = app_tables.tools_py_str.search()
+
         # Any code you write here will run before the form opens.
 
     def make_91_click(self, **event_args):
         """This method is called when the button is clicked"""
         pass
+
+    def add_py_click(self, **event_args):
+        """This method is called when the button is clicked"""
+        py_content = self.py_content.text
+        py_desc = self.py_desc.text
+        if not(py_desc) or not(py_content):
+            alert('脚本描述 脚本内容不能为空')
+            return
+        app_tables.tools_py_str.add_row(
+            info_desc=py_desc,    
+            python_code=py_content
+        )
+        Notification(f'添加成功 {py_desc} ').show()
+        self.repeating_panel_1.items = app_tables.tools_py_str.search()
+
 
      

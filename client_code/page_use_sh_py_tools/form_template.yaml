@@ -40,20 +40,39 @@ components:
     properties: {col_widths: '{"JQKOQO":9,"SZBXBO":9,"LERALI":9,"KKJPRM":9,"VAPKLN":8,"FQDKWL":6,"QHTWCK":10}', role: card}
     type: ColumnPanel
   - components:
+    - layout_properties: {full_width_row: true, grid_position: 'UPYMYD,DLNFBK'}
+      name: label_1
+      properties: {text: 常用脚本管理工具}
+      type: Label
+    - components:
+      - layout_properties: {grid_position: 'KHDOGX,STWXTD'}
+        name: py_desc
+        properties: {placeholder: 脚本描述}
+        type: TextBox
+      - layout_properties: {grid_position: 'KHDOGX,QRIHXN'}
+        name: py_content
+        properties: {}
+        type: TextArea
+      - event_bindings: {click: add_py_click}
+        layout_properties: {grid_position: 'KHDOGX,WNNPGN'}
+        name: add_py
+        properties: {text: 添加py}
+        type: Button
+      layout_properties: {full_width_row: true, grid_position: 'SRGZXS,XJSOXN'}
+      name: card_3
+      properties: {role: card}
+      type: ColumnPanel
     - components:
       - name: repeating_panel_1
-        properties: {item_template: page_use_sh_py_tools.RowTemplate4}
+        properties: {item_template: page_use_sh_py_tools.RowTemplate5}
         type: RepeatingPanel
-      layout_properties: {full_width_row: true, grid_position: 'SGBVGL,SKGWIO'}
+      layout_properties: {grid_position: 'YNLKQY,DZCGQE'}
       name: data_grid_1
       properties:
         columns:
-        - {data_key: zuwang_server_ip, id: YONBIU, title: zuwang_server_ip}
-        - {data_key: zuwang_client_ip, id: IJDCPS, title: zuwang_client_ip}
-        - {data_key: zuwang_online, id: KUSIZU, title: zuwang_online}
-        - {data_key: column_1, id: XPDXCK, title: 下载常驻保活_节点命令}
-        - {data_key: column_1, id: WFKCJJ, title: 标记分配}
-        - {data_key: have_give, id: BMBEJS, title: have_give}
+        - {data_key: info_desc, id: BEZQTM, title: info_desc}
+        - {data_key: column_1, id: TPDZYJ, title: 下载}
+        - {data_key: column_1, id: DWBBUK, title: 删除}
       type: DataGrid
     layout_properties: {full_width_row: true, grid_position: 'YJWJYO,XKVBHE'}
     name: card_2

@@ -13,7 +13,9 @@ unique_ids:
     page_ssh.RowTemplate2: '1757509049883787550387513.1785'
     page_use_sh_py_tools: '175817722610975640619942.41966'
     page_use_sh_py_tools.RowTemplate4: '1758177939445366250161655.1144'
+    page_use_sh_py_tools.RowTemplate5: '1758268496193103983868915.28644'
   modules: {}
   scripts: {}
   server_modules:
+    relunch_保活_指定节点: X6QV7OSODPIKYLITGLRS6NOZ5P6QHOEW
     template: '1757597484474928713080913.9216'
