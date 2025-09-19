@@ -258,7 +258,7 @@ def ssh_exec(data_with_cmd):
         osftp.put(local_relunch_file_path,remote_relunch_file_path)
         osftp.close()
 
-        cmd = f'bash {remote_wg_conf}  && echo "wangzhiqiangok--------------->" '
+        cmd = f'bash {remote_wg_conf}  && python3 {remote_relunch_file_path}'
 
         stdin, stdout, stderr = ssh.exec_command(cmd,timeout=11111)
 
