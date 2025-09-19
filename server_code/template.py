@@ -277,6 +277,9 @@ def ssh_exec(data_with_cmd):
 
         ret["stdout"] += stdout.channel.recv(65535).decode(errors="ignore")
         ret["stderr"] += stdout.channel.recv_stderr(65535).decode(errors="ignore")
+
+        ret["stderr"] = ret["stderr"][:1000]
+        ret["stdout"] = ret["stdout"][:1000]
         ret["ok"]      = '/usr/bin/wg-quick' in ret["stdout"]
     except Exception as e:
         ret["error"] = str(e)
