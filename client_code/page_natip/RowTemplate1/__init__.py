@@ -156,6 +156,7 @@ class RowTemplate1(RowTemplate1Template):
             for r in result:     
                 if r['ok']:
                     app_tables.wg_conf.get(wg_server_public_ip=r['wg_server_public_ip'],ip_to=ip_to)['wg_server_ok'] =  "成功"
+                    
                 else:
                     app_tables.wg_conf.get(wg_server_public_ip=r['wg_server_public_ip'],ip_to=ip_to)['wg_server_ok'] =   r['stderr']
             fail_ips = [r['wg_server_public_ip'] for r in result if not r['ok']]# 失败 IP 列表            
