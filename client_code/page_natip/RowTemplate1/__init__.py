@@ -448,14 +448,16 @@ class RowTemplate1(RowTemplate1Template):
         # wg 客户端  拼接命令的同时 吧 sh 也进行保存到/etc/wiregard/*.sh
         wg_client_lunchs = []
         for wg_conf_server_client in app_tables.wg_conf.search(ip_to=ip_to):
-            wg_client_ip  = wg_conf_server_client['wg_client_ip']
-            lunch_name = wg_client_ip.replace('.','_')
+            lunch_name =  wg_conf_server_client['wg_client_ip'].replace('.','_')
             sh_file = f'/etc/wireguard/{lunch_name}.sh'
             one_wg_client_conf = wg_conf_server_client['wg_client_conf']
 
             save_to_sh_and_shell_raw = f"""
-                echo "{one_wg_client_conf}" >  {sh_file}   
-                bash {sh_file}   
+            cat << 'EOF' > {sh_file}
+            {one_wg_client_conf}
+            EOF
+            
+            bash {sh_file}
             """
             wg_client_lunchs.append(save_to_sh_and_shell_raw)
             
