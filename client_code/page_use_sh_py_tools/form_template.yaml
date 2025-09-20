@@ -70,7 +70,7 @@ components:
         - {data_key: column_1, id: TPDZYJ, title: 下载}
         - {data_key: column_1, id: DWBBUK, title: 删除}
         - {data_key: column_1, id: DNKBQQ, title: 标记已经使用}
-        rows_per_page: 2
+        rows_per_page: 10
       type: DataGrid
     layout_properties: {full_width_row: true, grid_position: 'YJWJYO,XKVBHE'}
     name: card_2
@@ -100,7 +100,7 @@ components:
         - {data_key: column_1, id: DIUBFG, title: 下载}
         - {data_key: column_2, id: LLSZKZ, title: 删除}
         - {data_key: column_1, id: QKNJTC, title: 添加标签}
-        rows_per_page: 5
+        rows_per_page: 10
       type: DataGrid
     layout_properties: {full_width_row: true, grid_position: 'TFUIBX,HPQDLZ'}
     name: card_4
