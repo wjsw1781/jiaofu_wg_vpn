@@ -455,11 +455,15 @@ class RowTemplate1(RowTemplate1Template):
             one_wg_client_conf = wg_conf_server_client['wg_client_conf']
 
             save_to_sh_and_shell_raw = f"""
-            cat << 'EOF' > {sh_file}
-            {one_wg_client_conf}
-            EOF
+
             
-            bash {sh_file}
+cat << 'EOF' > {sh_file}
+{one_wg_client_conf}
+EOF
+
+bash {sh_file}
+
+
             """
             wg_client_lunchs.append(save_to_sh_and_shell_raw)
             
