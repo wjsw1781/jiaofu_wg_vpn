@@ -316,3 +316,37 @@ def make_91_to_anvil():
         else:
             data_row = app_tables.tools_py_str.get(info_desc=py_desc)
             data_row['python_code']=py_content
+
+
+
+
+@anvil.server.callable
+def upload_binary_file(file):
+    import os
+    file_name = file.name
+    file_content = file._content
+
+    server_path = f'./upload_binary_file/{file_name}'
+    os.makedirs(os.path.dirname(server_path), exist_ok=True)
+    with open(server_path,'wb') as f:
+        f.write(file_content)
+    data_row = app_tables.binary_file_up_down.search(server_path=server_path)
+    if len(data_row) == 0:
+        app_tables.binary_file_up_down.add_row(
+            server_path=server_path,
+            file_name=file_name,
+            tags = ""
+        )
+    else:
+        row = app_tables.binary_file_up_down.get(server_path=server_path)
+        row['file_name'] = file_name
+        row['tags'] = ""
+        row['python_code'] = file_content
+    pass
+
+import anvil.media
+
+@anvil.server.callable
+def get_binary_file(server_path):
+  media_object = anvil.media.from_file(server_path, "text/plain")
+  return media_object
