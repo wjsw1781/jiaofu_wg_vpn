@@ -297,14 +297,22 @@ def ssh_exec(data_with_cmd):
 
 @anvil.server.callable
 def make_91_to_anvil():
-    import json
+    import json,re
     file_name = '91_client_script_up.json'
     with open(file_name,'r') as f:
         data = json.load(f)
-    for index, i in enumerate(data):
-        py_desc = str(index)
-        py_content = i
-        app_tables.tools_py_str.add_row(
-            info_desc=py_desc,    
-            python_code=py_content
-        )
+    for index, py_content in enumerate(data):
+
+        pattern = r"Address =(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/\d{1,2}(?:\r?\n|$)"
+
+        match = re.search(pattern, py_content)
+        py_desc = match.group(1)
+        have_in = app_tables.tools_py_str.search( info_desc=py_desc)
+        if len(have_in) == 0:
+            app_tables.tools_py_str.add_row(
+                info_desc=py_desc,
+                python_code=py_content
+            )
+        else:
+            data_row = app_tables.tools_py_str.get(info_desc=py_desc)
+            data_row['python_code']=py_content
