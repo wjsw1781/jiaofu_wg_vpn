@@ -105,6 +105,8 @@ pkill -f anvil-app-server
 47.97.83.157:58000
 
 
-
+watch -n1 "echo '--- enp87s0 ---'; ip -s link show enp87s0; \
+           echo '--- enp2s0f0 ---'; ip -s link show enp2s0f0; \
+           echo '--- 10_1_0_77 ---'; ip -s link show 10_1_0_77"
 
 
