@@ -12,6 +12,7 @@ class page_use_sh_py_tools(page_use_sh_py_toolsTemplate):
         self.init_components(**properties)
 
         self.repeating_panel_1.items = app_tables.tools_py_str.search()
+        self.repeating_panel_2.items = app_tables.binary_file_up_down.search()
 
         # Any code you write here will run before the form opens.
 
@@ -33,6 +34,21 @@ class page_use_sh_py_tools(page_use_sh_py_toolsTemplate):
         )
         Notification(f'添加成功 {py_desc} ').show()
         self.repeating_panel_1.items = app_tables.tools_py_str.search()
+
+    def file_loader_1_change(self, file, **event_args):
+        """This method is called when a new file is loaded into this FileLoader"""
+        if file:
+            try:
+                # 调用服务器函数上传文件
+                anvil.server.call('upload_binary_file', file)
+                self.repeating_panel_2.items = app_tables.binary_file_up_down.search()
+
+                Notification(f"文件 '{file.name}' 上传成功！").show()
+                
+            except Exception as e:
+                Notification(f"文件上传失败: {e}", title="错误", style="danger").show()
+        else:
+            Notification("未选择文件进行上传。", style="warning").show()
 
 
      

@@ -26,4 +26,11 @@ class RowTemplate5(RowTemplate5Template):
 
         self.parent.parent.parent.parent.parent.repeating_panel_1.items = app_tables.tools_py_str.search()
 
+    def button_1_click(self, **event_args):
+        """This method is called when the button is clicked"""
+        t = TextBox()
+        alert(content=t,title="备注一下这个节点被那个机器使用了 地点 业务方")
+        if t.text:
+            self.item['have_be_use'] = t.text
+
 

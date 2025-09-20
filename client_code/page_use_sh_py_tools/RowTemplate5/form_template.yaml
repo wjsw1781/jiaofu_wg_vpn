@@ -9,5 +9,10 @@ components:
   name: del_py
   properties: {text: 删除}
   type: Button
+- event_bindings: {click: button_1_click}
+  layout_properties: {column: DNKBQQ}
+  name: button_1
+  properties: {text: 标记已使用}
+  type: Button
 container: {type: DataRowPanel}
 is_package: true

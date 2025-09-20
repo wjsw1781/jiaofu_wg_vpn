@@ -1,24 +1,38 @@
 allow_embedding: false
 db_schema:
-  nat_table:
+  binary_file_up_down:
     client: full
     columns:
     - admin_ui: {order: 0, width: 200}
-      name: ip_use_from
+      name: file_name
       type: string
     - admin_ui: {order: 1, width: 200}
-      name: ip_use_to
+      name: server_path
       type: string
     - admin_ui: {order: 2, width: 200}
+      name: tags
+      type: string
+    server: full
+    title: binary_file_up_down
+  nat_table:
+    client: full
+    columns:
+    - admin_ui: {width: 200}
+      name: ip_use_from
+      type: string
+    - admin_ui: {width: 200}
+      name: ip_use_to
+      type: string
+    - admin_ui: {width: 200}
       name: info
       type: string
-    - admin_ui: {order: 3, width: 200}
+    - admin_ui: {width: 200}
       name: wg_listen_port
       type: number
-    - admin_ui: {order: 4, width: 200}
+    - admin_ui: {width: 200}
       name: minipc_wifi_iplink_name
       type: string
-    - admin_ui: {order: 5, width: 200}
+    - admin_ui: {width: 200}
       name: rt_table_id_from
       type: string
     server: full
@@ -26,48 +40,51 @@ db_schema:
   tools_py_str:
     client: full
     columns:
-    - admin_ui: {order: 0, width: 200}
+    - admin_ui: {width: 200}
       name: info_desc
       type: string
-    - admin_ui: {order: 1, width: 200}
+    - admin_ui: {width: 200}
       name: python_code
+      type: string
+    - admin_ui: {width: 200}
+      name: have_be_use
       type: string
     server: full
     title: tools_py_str
   wg_conf:
     client: full
     columns:
-    - admin_ui: {order: 0, width: 122}
+    - admin_ui: {width: 122}
       name: wg_server_ip
       type: string
-    - admin_ui: {order: 1, width: 261}
+    - admin_ui: {width: 261}
       name: wg_client_ip
       type: string
-    - admin_ui: {order: 2, width: 85}
+    - admin_ui: {width: 85}
       name: wg_server_conf
       type: string
-    - admin_ui: {order: 3, width: 200}
+    - admin_ui: {width: 200}
       name: wg_client_conf
       type: string
-    - admin_ui: {order: 4, width: 200}
+    - admin_ui: {width: 200}
       name: wg_server_public_ip
       type: string
-    - admin_ui: {order: 5, width: 136}
+    - admin_ui: {width: 136}
       name: ip_to
       type: string
-    - admin_ui: {order: 6, width: 127}
+    - admin_ui: {width: 127}
       name: wg_server_ok
       type: string
-    - admin_ui: {order: 7, width: 269}
+    - admin_ui: {width: 269}
       name: wg_client_ok
       type: string
-    - admin_ui: {order: 8, width: 200}
+    - admin_ui: {width: 200}
       name: ip_rule_phone
       type: string
-    - admin_ui: {order: 9, width: 200}
+    - admin_ui: {width: 200}
       name: minipc_wifi_iplink_name
       type: string
-    - admin_ui: {order: 10, width: 200}
+    - admin_ui: {width: 200}
       name: wg_listen_port
       type: string
     server: full
@@ -75,16 +92,16 @@ db_schema:
   wg_ip_rule:
     client: full
     columns:
-    - admin_ui: {order: 0, width: 200}
+    - admin_ui: {width: 200}
       name: ip_from_phone
       type: string
-    - admin_ui: {order: 1, width: 200}
+    - admin_ui: {width: 200}
       name: ip_to_wg_client
       type: string
-    - admin_ui: {order: 2, width: 200}
+    - admin_ui: {width: 200}
       name: for_key_ip_use_to_wg_16
       type: string
-    - admin_ui: {order: 3, width: 200}
+    - admin_ui: {width: 200}
       name: info
       type: string
     server: full
