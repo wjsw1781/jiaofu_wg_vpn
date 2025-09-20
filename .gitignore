@@ -3,3 +3,4 @@
 __pycache__
 .anvil-data
 wg_conf/**
+upload_binary_file/**
