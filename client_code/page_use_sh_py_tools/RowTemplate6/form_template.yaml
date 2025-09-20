@@ -1,0 +1,16 @@
+components:
+- event_bindings: {click: down_binary_file_click}
+  layout_properties: {column: DIUBFG}
+  name: down_binary_file
+  properties: {text: 下载}
+  type: Button
+- layout_properties: {column: LLSZKZ}
+  name: button_2
+  properties: {text: 删除}
+  type: Button
+- layout_properties: {column: QKNJTC}
+  name: button_3
+  properties: {text: 添加标签}
+  type: Button
+container: {type: DataRowPanel}
+is_package: true
