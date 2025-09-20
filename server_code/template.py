@@ -143,8 +143,8 @@ def get_wg_server_client_conf(client_ip,server_ip,server_public_ip,ip_from,ip_to
         if [ -n "$PORT_IN_USE" ]; then
             echo "WARN: WireGuard ListenPort {ListenPort} 已被其他 WG 接口占用。正在关闭所有 WG 接口以避免冲突..."
             # 关闭所有 wg 进程 防止端口冲突 起不来wg 进程 清理路由表 路由规则 保持干净环境
-            # 这里使用 wg show interfaces 获取所有接口名，然后逐个执行 wg-quick down
-            wg show interfaces | xargs -n 1 | xargs -n 1 wg-quick down
+            # 这里使用 wg show interfaces 获取所有接口名，然后逐个执行 wg-quick down  应该是找到指定的旧接口名
+            wg show all dump | grep -v none | grep "{ListenPort}" | awk '{{print $1}}' | xargs -n1 wg-quick down
             
             echo "所有 WireGuard 接口已关闭。"
             # wg show interfaces | xargs -n 1 |xargs -n1 wg-quick down
