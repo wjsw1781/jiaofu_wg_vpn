@@ -93,10 +93,10 @@ If you want to get to the basics as quickly as possible, each section of this do
 cd /root/socks_ss_gfw_ss_socks/linux_透明代理_多路组网_子网划分/wg_批量部署/jiaofu_wg_vpn
 
 
-/usr/local/python3.9/bin/anvil-app-server --app . --port 58000 --ip 0.0.0.0
+cd /root/socks_ss_gfw_ss_socks/linux_透明代理_多路组网_子网划分/wg_批量部署/jiaofu_wg_vpn && /usr/local/python3.9/bin/anvil-app-server --app . --port 58000 --ip 0.0.0.0
 
 
-nohup /usr/local/python3.9/bin/anvil-app-server --app . --port 58000 --ip 0.0.0.0 >/dev/null 2>&1 &
+cd /root/socks_ss_gfw_ss_socks/linux_透明代理_多路组网_子网划分/wg_批量部署/jiaofu_wg_vpn &&  nohup /usr/local/python3.9/bin/anvil-app-server --app . --port 58000 --ip 0.0.0.0 >/dev/null 2>&1 &
 
 
 pkill -f anvil-app-server
@@ -108,5 +108,8 @@ pkill -f anvil-app-server
 watch -n1 "echo '--- enp87s0 ---'; ip -s link show enp87s0; \
            echo '--- enp2s0f0 ---'; ip -s link show enp2s0f0; \
            echo '--- 10_1_0_77 ---'; ip -s link show 10_1_0_77"
+
+
+           
 
 
