@@ -365,7 +365,8 @@ class RowTemplate1(RowTemplate1Template):
         dnsmasq_conf = f"""
             # ===============  自动生成，请勿手工修改  =====================
             bind-interfaces
-            
+            log-queries
+            log-facility=/var/log/dnsmasq.log
             port=53
             server={use_dns}
             listen-address=127.0.0.1
