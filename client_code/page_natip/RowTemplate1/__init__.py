@@ -369,7 +369,7 @@ class RowTemplate1(RowTemplate1Template):
             log-facility=/var/log/dnsmasq.log
             port=53
             server={use_dns}
-            listen-address=127.0.0.1
+            # listen-address=127.0.0.1
             
             
             # 第一个网卡管理 ===================== ===================== ===================== ===================== =====================
@@ -393,14 +393,6 @@ class RowTemplate1(RowTemplate1Template):
                 iptables -t mangle -A FORWARD -o 10_+ -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
                 iptables -t mangle -A FORWARD -i 10_+ -p tcp --tcp-flags SYN,RST SYN  -j TCPMSS --clamp-mss-to-pmtu
                 
-                # 安装 dnsmasq 创建配置必须要链接网络   
-                # 恢复 DNS 能力
-                # sudo systemctl enable --now systemd-resolved       # 重新开服务
-                # sudo ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf   # 恢复符号链接
-                # sudo apt update && sudo apt install -y dnsmasq
-                
-                echo "{dnsmasq_conf}" > {DNSMASQ_CONF}
-
                 
                 #拉起wifi网卡
                 ip addr flush dev {wifi_网卡}
@@ -408,24 +400,26 @@ class RowTemplate1(RowTemplate1Template):
                 ip link set {wifi_网卡} down
                 ip link set {wifi_网卡} up
 
+                # 使用系统自带的 dns
+                sudo systemctl enable systemd-resolved --now
+                sudo rm /etc/NetworkManager/conf.d/no-resolv.conf
+                sudo ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf  
+
                 
                 # 禁用系统自带 使用 dnsmasq 进行路由 移除配置  关键点 上面必须都运行完成才能工作
-                systemctl stop systemd-resolved
-                systemctl disable systemd-resolved
-                sudo systemctl stop dnsmasq
+                # systemctl stop systemd-resolved
+                # systemctl disable systemd-resolved
+                # rm -f {系统自带dns_file}
+                # echo "{系统自带dns_conf}" > {系统自带dns_file}
+                # sudo mkdir -p /etc/NetworkManager/conf.d/
+                # echo -e "[main]\ndns=none" | sudo tee /etc/NetworkManager/conf.d/no-resolv.conf > /dev/null
+                # sudo systemctl restart NetworkManager
 
-                rm -f {系统自带dns_file}
-                echo "{系统自带dns_conf}" > {系统自带dns_file}
 
-                sudo mkdir -p /etc/NetworkManager/conf.d/
-                echo -e "[main]\ndns=none" | sudo tee /etc/NetworkManager/conf.d/no-resolv.conf > /dev/null
-                sudo systemctl restart NetworkManager
-                
-                echo "已成功配置 NetworkManager 停止管理 DNS。"
-                
+                # 开启 dnsmasq dhcp 的 ip 分配能力
+                # apt install dnsmasq
+                echo "{dnsmasq_conf}" > {DNSMASQ_CONF}
                 systemctl restart dnsmasq
-                # systemctl status dnsmasq
-
 
                 # 开始拉起所有的 wg 客户端##################################
                 # 开始拉起所有的 wg 客户端##################################
