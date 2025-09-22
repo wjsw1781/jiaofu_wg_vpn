@@ -369,7 +369,7 @@ class RowTemplate1(RowTemplate1Template):
             log-facility=/var/log/dnsmasq.log
             port=53
             server={use_dns}
-            listen-address=127.0.0.1
+            # listen-address=127.0.0.1
             
             
             # 第一个网卡管理 ===================== ===================== ===================== ===================== =====================
@@ -399,7 +399,6 @@ class RowTemplate1(RowTemplate1Template):
                 # sudo ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf   # 恢复符号链接
                 # sudo apt update && sudo apt install -y dnsmasq
                 
-                echo "{dnsmasq_conf}" > {DNSMASQ_CONF}
 
                 
                 #拉起wifi网卡
@@ -408,21 +407,23 @@ class RowTemplate1(RowTemplate1Template):
                 ip link set {wifi_网卡} down
                 ip link set {wifi_网卡} up
 
+                # 使用系统自带的 dns
+                sudo systemctl enable systemd-resolved --now
+                sudo rm /etc/NetworkManager/conf.d/no-resolv.conf
+
+
                 
                 # 禁用系统自带 使用 dnsmasq 进行路由 移除配置  关键点 上面必须都运行完成才能工作
-                systemctl stop systemd-resolved
-                systemctl disable systemd-resolved
-                sudo systemctl stop dnsmasq
+                # systemctl stop systemd-resolved
+                # systemctl disable systemd-resolved
+                # rm -f {系统自带dns_file}
+                # echo "{系统自带dns_conf}" > {系统自带dns_file}
+                # sudo mkdir -p /etc/NetworkManager/conf.d/
+                # echo -e "[main]\ndns=none" | sudo tee /etc/NetworkManager/conf.d/no-resolv.conf > /dev/null
+                # sudo systemctl restart NetworkManager
 
-                rm -f {系统自带dns_file}
-                echo "{系统自带dns_conf}" > {系统自带dns_file}
+                        echo "{dnsmasq_conf}" > {DNSMASQ_CONF}
 
-                sudo mkdir -p /etc/NetworkManager/conf.d/
-                echo -e "[main]\ndns=none" | sudo tee /etc/NetworkManager/conf.d/no-resolv.conf > /dev/null
-                sudo systemctl restart NetworkManager
-                
-                echo "已成功配置 NetworkManager 停止管理 DNS。"
-                
                 systemctl restart dnsmasq
                 # systemctl status dnsmasq
 
