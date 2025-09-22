@@ -358,8 +358,7 @@ class RowTemplate1(RowTemplate1Template):
             
             # B. 重启 NetworkManager
             # systemctl restart NetworkManager
-                        
-            
+
         """
     
 
@@ -422,7 +421,10 @@ class RowTemplate1(RowTemplate1Template):
                 systemctl stop systemd-resolved
                 systemctl disable systemd-resolved
                 sudo systemctl stop dnsmasq
+
+                rm -f {系统自带dns_file}
                 echo "{系统自带dns_conf}" > {系统自带dns_file}
+                
                 systemctl restart dnsmasq
                 # systemctl status dnsmasq
 
