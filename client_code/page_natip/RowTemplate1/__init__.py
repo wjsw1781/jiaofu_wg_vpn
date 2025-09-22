@@ -348,8 +348,6 @@ class RowTemplate1(RowTemplate1Template):
 
         系统自带dns_conf = """
             nameserver 127.0.0.1
-
-
         """
     
 
