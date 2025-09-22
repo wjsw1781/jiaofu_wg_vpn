@@ -348,8 +348,6 @@ class RowTemplate1(RowTemplate1Template):
 
         系统自带dns_conf = """
             nameserver 127.0.0.1
-
-
         """
     
 
@@ -393,13 +391,6 @@ class RowTemplate1(RowTemplate1Template):
                 iptables -t mangle -A FORWARD -o 10_+ -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
                 iptables -t mangle -A FORWARD -i 10_+ -p tcp --tcp-flags SYN,RST SYN  -j TCPMSS --clamp-mss-to-pmtu
                 
-                # 安装 dnsmasq 创建配置必须要链接网络   
-                # 恢复 DNS 能力
-                # sudo systemctl enable --now systemd-resolved       # 重新开服务
-                # sudo ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf   # 恢复符号链接
-                # sudo apt update && sudo apt install -y dnsmasq
-                
-
                 
                 #拉起wifi网卡
                 ip addr flush dev {wifi_网卡}
@@ -410,7 +401,7 @@ class RowTemplate1(RowTemplate1Template):
                 # 使用系统自带的 dns
                 sudo systemctl enable systemd-resolved --now
                 sudo rm /etc/NetworkManager/conf.d/no-resolv.conf
-
+                sudo ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf  
 
                 
                 # 禁用系统自带 使用 dnsmasq 进行路由 移除配置  关键点 上面必须都运行完成才能工作
@@ -422,11 +413,11 @@ class RowTemplate1(RowTemplate1Template):
                 # echo -e "[main]\ndns=none" | sudo tee /etc/NetworkManager/conf.d/no-resolv.conf > /dev/null
                 # sudo systemctl restart NetworkManager
 
-                        echo "{dnsmasq_conf}" > {DNSMASQ_CONF}
 
+                # 开启 dnsmasq dhcp 的 ip 分配能力
+                # apt install dnsmasq
+                echo "{dnsmasq_conf}" > {DNSMASQ_CONF}
                 systemctl restart dnsmasq
-                # systemctl status dnsmasq
-
 
                 # 开始拉起所有的 wg 客户端##################################
                 # 开始拉起所有的 wg 客户端##################################
