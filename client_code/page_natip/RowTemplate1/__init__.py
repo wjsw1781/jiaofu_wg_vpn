@@ -365,9 +365,10 @@ class RowTemplate1(RowTemplate1Template):
 
         ali_dns = '223.5.5.5' 
         google_dns = '8.8.8.8'
+        cf_dns = '1.1.1.1'
         china_dns = '114.114.114.114'
         ad = '94.140.14.14'
-        use_dns = ali_dns
+        use_dns = cf_dns
         lease_time = "12h"
         netmask = "255.255.0.0"            
         
