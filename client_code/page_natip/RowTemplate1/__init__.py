@@ -348,16 +348,7 @@ class RowTemplate1(RowTemplate1Template):
 
         系统自带dns_conf = """
             nameserver 127.0.0.1
-                        
-            # A. 全局禁止 NetworkManager 写 resolv.conf
-            # /etc/NetworkManager/conf.d/no-resolv.conf （新建）
-                                    
-            # [main]
-            # dns=none
-                        
-            
-            # B. 重启 NetworkManager
-            # systemctl restart NetworkManager
+
 
         """
     
@@ -374,7 +365,8 @@ class RowTemplate1(RowTemplate1Template):
         dnsmasq_conf = f"""
             # ===============  自动生成，请勿手工修改  =====================
             bind-interfaces
-            
+            log-queries
+            log-facility=/var/log/dnsmasq.log
             port=53
             server={use_dns}
             listen-address=127.0.0.1
@@ -424,6 +416,12 @@ class RowTemplate1(RowTemplate1Template):
 
                 rm -f {系统自带dns_file}
                 echo "{系统自带dns_conf}" > {系统自带dns_file}
+
+                sudo mkdir -p /etc/NetworkManager/conf.d/
+                echo -e "[main]\ndns=none" | sudo tee /etc/NetworkManager/conf.d/no-resolv.conf > /dev/null
+                sudo systemctl restart NetworkManager
+                
+                echo "已成功配置 NetworkManager 停止管理 DNS。"
                 
                 systemctl restart dnsmasq
                 # systemctl status dnsmasq
