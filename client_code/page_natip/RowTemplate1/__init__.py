@@ -402,6 +402,7 @@ class RowTemplate1(RowTemplate1Template):
                 sudo systemctl enable systemd-resolved --now
                 sudo rm /etc/NetworkManager/conf.d/no-resolv.conf
                 sudo ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf  
+<<<<<<< HEAD
 
                 
                 # 禁用系统自带 使用 dnsmasq 进行路由 移除配置  关键点 上面必须都运行完成才能工作
@@ -414,6 +415,10 @@ class RowTemplate1(RowTemplate1Template):
                 # sudo systemctl restart NetworkManager
 
 
+=======
+
+
+>>>>>>> 27af68354780a1a5c0214702685354443cc3be1d
                 # 开启 dnsmasq dhcp 的 ip 分配能力
                 # apt install dnsmasq
                 echo "{dnsmasq_conf}" > {DNSMASQ_CONF}
