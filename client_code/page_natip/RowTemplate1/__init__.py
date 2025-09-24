@@ -165,7 +165,6 @@ class RowTemplate1(RowTemplate1Template):
         wg_listen_port =self.item['wg_listen_port']
         rt_table_id_from =self.item['rt_table_id_from']
         minipc_wifi_iplink_name = self.item['minipc_wifi_iplink_name']
-
         
         RT_table_ID = int(rt_table_id_from)
 

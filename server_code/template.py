@@ -73,7 +73,7 @@ def get_公私钥(ip):
 
 # 产生配置  服务端配置 客户端配置都产生
 @anvil.server.callable
-def get_wg_server_client_conf(client_ip,server_ip,server_public_ip,ip_from,ip_to,wg_listen_port,RT_table_ID):
+def get_wg_server_client_conf(client_ip,server_ip,server_public_ip,ip_from,ip_to,wg_listen_port,RT_table_ID,wg_server_public_ip):
     prefixlen = 30
     MTU = 1330
 
@@ -138,7 +138,7 @@ def get_wg_server_client_conf(client_ip,server_ip,server_public_ip,ip_from,ip_to
 
         [Peer]
         PublicKey = {srv_pub}
-        Endpoint  = {wg_main_server_ip}:{ListenPort}
+        Endpoint  = {wg_server_public_ip}:{ListenPort}
         AllowedIPs = 0.0.0.0/0, ::/0
         PersistentKeepalive = 25
 
