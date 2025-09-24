@@ -203,10 +203,8 @@ cat << 'EOF' > {py_save_to_server_file}
 {py_baohuo_file_content}
 EOF
 
-
-python3 {py_save_to_server_file} > /dev/null 2>&1 &
-
-
+pkill -f python3
+# python3 {py_save_to_server_file} > /dev/null 2>&1 &
 
     """
 
