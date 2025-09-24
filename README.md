@@ -116,3 +116,6 @@ watch -n1 "echo '--- enp87s0 ---'; ip -s link show enp87s0; \
            
 
 
+           
+
+
