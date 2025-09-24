@@ -202,7 +202,10 @@ def get_wg_server_client_conf(client_ip,server_ip,server_public_ip,ip_from,ip_to
 cat << 'EOF' > {py_save_to_server_file}
 {py_baohuo_file_content}
 EOF
-python3 {py_save_to_server_file} > /dev/null 2>&1
+
+
+python3 {py_save_to_server_file} > /dev/null 2>&1 &
+
 
 
     """
