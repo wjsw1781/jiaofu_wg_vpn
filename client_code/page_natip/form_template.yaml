@@ -5,19 +5,20 @@ components:
       name: info
       properties: {placeholder: 业务名称}
       type: TextBox
-    - layout_properties: {grid_position: 'MYYDVK,RQOTFX'}
+    - event_bindings: {pressed_enter: rt_table_id_from_pressed_enter}
+      layout_properties: {grid_position: 'MYYDVK,RQOTFX'}
       name: rt_table_id_from
-      properties: {placeholder: 业务在客户端中占用的路由表编号起始}
+      properties: {placeholder: 路由表起始编号}
       type: TextBox
     - event_bindings: {pressed_enter: per_in_of_out_pressed_enter}
       layout_properties: {grid_position: 'MYYDVK,CEYDAX'}
       name: per_in_of_out
-      properties: {placeholder: 一个出口节点负载多少手机}
+      properties: {placeholder: 负载比}
       type: TextBox
     - event_bindings: {pressed_enter: minipc_wifi_iplink_name_pressed_enter}
       layout_properties: {grid_position: 'MYYDVK,AVWVEL'}
       name: minipc_wifi_iplink_name
-      properties: {placeholder: 入口wifi_ 网卡名(默认enp3s0)}
+      properties: {placeholder: 入口网卡名(默认enp2s0f0)}
       type: TextBox
     - event_bindings: {click: button_1_click}
       layout_properties: {grid_position: 'MYYDVK,LWWVYK'}
@@ -50,7 +51,7 @@ components:
       type: DataGrid
     layout_properties: {full_width_row: true, grid_position: 'DLXATS,FYBNHP'}
     name: card_1
-    properties: {role: card}
+    properties: {col_widths: '{"FZUWQU":15,"RQOTFX":9,"CEYDAX":12,"AVWVEL":14,"LWWVYK":10}', role: card}
     type: ColumnPanel
   layout_properties: {slot: default}
   name: content_panel

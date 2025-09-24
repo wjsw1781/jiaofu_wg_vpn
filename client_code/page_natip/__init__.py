@@ -103,3 +103,7 @@ class page_natip(page_natipTemplate):
     def per_in_of_out_pressed_enter(self, **event_args):
         """This method is called when the user presses Enter in this text box"""
         pass
+
+    def rt_table_id_from_pressed_enter(self, **event_args):
+        """This method is called when the user presses Enter in this text box"""
+        pass

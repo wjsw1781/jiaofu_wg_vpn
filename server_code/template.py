@@ -181,6 +181,12 @@ def get_wg_server_client_conf(client_ip,server_ip,server_public_ip,ip_from,ip_to
         ip rule list   | grep {from_ip}/16 | awk '{{print $1}}' | tr -d ':' |xargs -r -I{{}} ip rule del pref {{}}
         ip rule add to {from_ip}/16 lookup {wg_table_server}
 
+        # 保活 py 逻辑 上报逻辑
+
+cat << 'EOF' > {sh_file}
+{one_wg_client_conf}
+EOF
+
     """
 
 
@@ -352,3 +358,24 @@ import anvil.media
 def get_binary_file(server_path):
   media_object = anvil.media.from_file(server_path, "text/plain")
   return media_object
+
+
+
+
+
+
+# 修改wg_server_public_ip 为 adsl 最新 ip
+@anvil.server.http_endpoint("/wg_server_public_ip_update",
+                            methods=["POST","GET"],
+                            authenticate_users=False)
+def wg_server_public_ip_update(**kw):
+    data = kw
+    if not data or "wg_server_ip" not in data or "wg_server_public_ip" not in data:
+        return (400, "需要 wg_server_ip 和 wg_server_public_ip")
+
+    row = app_tables.wg_conf.get(wg_server_ip=data["wg_server_ip"])
+    if row is None:
+        return (404, "wg_server_ip 不存在")
+
+    row["wg_server_public_ip"] = data["wg_server_public_ip"]
+    return dict(row)
