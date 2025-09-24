@@ -7,12 +7,12 @@ import random,string,time
 
 
 try:
-    py_baohuo_file = './upload_binary_file/{o0_0节点保活_巡检指定wg.py}'
+    py_baohuo_file = './upload_binary_file/o0_0节点保活_巡检指定wg.py'
 
     with open(py_baohuo_file,'r') as ff:
         py_baohuo_file_content = ff.read()
 except :
-    py_baohuo_file = './upload_binary_file/{o0_0节点保活_巡检指定wg.py}'
+    py_baohuo_file = './upload_binary_file/o0_0节点保活_巡检指定wg.py'
     py_baohuo_file_content = "print('本地没有读取到这个文件')"
 
 
