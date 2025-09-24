@@ -188,11 +188,15 @@ class RowTemplate1(RowTemplate1Template):
             client_ip = int_to_ip(client_ip_int)
             server_ip = int_to_ip(server_ip_int)
             try:
-                server_public_ip = self.server_ips[self.server_ip_index]
+                server_public_ip = self.server_ips[self.server_ip_index][0]
+                
+                ssh_port = self.server_ips[self.server_ip_index][1]
+                ssh_pwd = self.server_ips[self.server_ip_index][2]
+                ssh_host = self.server_ips[self.server_ip_index][0]
                 self.server_ip_index += 1   
             except :
                 break
-            all_conf.append([client_ip,server_ip,server_public_ip,ip_from,ip_to,wg_listen_port,RT_table_ID])
+            all_conf.append([client_ip,server_ip,server_public_ip,ip_from,ip_to,wg_listen_port,RT_table_ID,ssh_host,ssh_port,ssh_pwd])
     
             # 下一 /30
             current += 4
@@ -200,7 +204,7 @@ class RowTemplate1(RowTemplate1Template):
     
         def thread_run_one_conf(one_conf):
             
-            client_ip,server_ip,server_public_ip,ip_from,ip_to,wg_listen_port,RT_table_ID = one_conf
+            client_ip,server_ip,server_public_ip,ip_from,ip_to,wg_listen_port,RT_table_ID,ssh_host,ssh_port,ssh_pwd = one_conf
     
             client_conf,server_conf= anvil.server.call('get_wg_server_client_conf',client_ip,server_ip,server_public_ip,ip_from,ip_to,wg_listen_port,RT_table_ID)
     
@@ -216,6 +220,10 @@ class RowTemplate1(RowTemplate1Template):
                 row['minipc_wifi_iplink_name'] = minipc_wifi_iplink_name
                 row['wg_listen_port'] =  str(wg_listen_port)
                 
+                row['ssh_host'] =  str(ssh_host)
+                row['ssh_port'] =  str(ssh_port)
+                row['ssh_pwd'] =  str(ssh_pwd)
+                
             else:                                                 # 不存在 → 新增
                 
                 app_tables.wg_conf.add_row(
@@ -227,6 +235,10 @@ class RowTemplate1(RowTemplate1Template):
                     ip_to = ip_to,
                     minipc_wifi_iplink_name =minipc_wifi_iplink_name,
                     wg_listen_port = str(wg_listen_port),
+
+                    ssh_host = str(ssh_host),
+                    ssh_port =  str(ssh_port),
+                    ssh_pwd=  str(ssh_pwd),
                 )
     
             all_conf_after_threads.append(server_conf)
@@ -253,10 +265,6 @@ class RowTemplate1(RowTemplate1Template):
             time.sleep(1)
             
 
-
-            
-
-
             
     def file_loader_1_change(self, file, **event_args):
         import re
@@ -279,11 +287,14 @@ class RowTemplate1(RowTemplate1Template):
         
         ips, ports, pwds = [], [], []
         for r in data:
+            if len(r)<pw_i or len(r)<ip_i or len(r)<pt_i :
+                continue
             # ip 
             if ':' in r[ip_i]:
                 ip, port = r[ip_i].split(':')[0],r[ip_i].split(':')[1]
             else:
                 ip = r[ip_i]
+                
             # port
             if pt_i is not None:
                 if ':' in r[pt_i]:
@@ -292,7 +303,7 @@ class RowTemplate1(RowTemplate1Template):
                     port =r[pt_i]
 
             else:
-                port = 22
+                port = '22'
                 
             # 密码
             if pw_i is not None:
@@ -307,10 +318,11 @@ class RowTemplate1(RowTemplate1Template):
         if not ips:
             alert("CSV 文件中未找到合法的公网 IP！")
             return
+            
+        triples = list(zip(ips, ports, pwds)) 
+        alert(f"获取到的公网 ip---->   {triples}")
         
-        alert("获取到的公网 ip---->"+"\n".join(ips) )
-        
-        self.server_ips = ips       # 保存到 form 的实例变量
+        self.server_ips = triples       # 保存到 form 的实例变量
         self.server_ip_index = 0    # 当前已分配到第几个
         
         alert(f"已载入 {len(ips)} 个服务器公网 IP。", title="上传成功")

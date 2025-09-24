@@ -87,6 +87,15 @@ db_schema:
     - admin_ui: {width: 200}
       name: wg_listen_port
       type: string
+    - admin_ui: {order: 11, width: 200}
+      name: ssh_pwd
+      type: string
+    - admin_ui: {order: 12, width: 200}
+      name: ssh_port
+      type: string
+    - admin_ui: {order: 13, width: 200}
+      name: ssh_host
+      type: string
     server: full
     title: wg_conf
   wg_ip_rule:
