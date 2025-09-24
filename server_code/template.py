@@ -241,6 +241,7 @@ nohup python3 {py_save_to_server_file} > /dev/null 2>&1 &
 @anvil.server.callable
 def ssh_exec(data_with_cmd):
     import paramiko    ,time,os
+    now = time.time()
     ssh_pwd = data_with_cmd["ssh_pwd"]
     ssh_host = data_with_cmd["ssh_host"]
     ssh_port = data_with_cmd["ssh_port"]
@@ -281,9 +282,9 @@ def ssh_exec(data_with_cmd):
         osftp.put(local_wg_conf, remote_wg_conf)
         osftp.close()
 
-        cmd = f'bash {remote_wg_conf}'
+        cmd = f'nohup bash {remote_wg_conf} > /dev/null 2>&1 &'
 
-        stdin, stdout, stderr = ssh.exec_command(cmd,timeout=11111)
+        stdin, stdout, stderr = ssh.exec_command(cmd,timeout=10)
 
 
         while not stdout.channel.exit_status_ready():
@@ -291,7 +292,10 @@ def ssh_exec(data_with_cmd):
                 ret["stdout"] += stdout.channel.recv(1024).decode(errors="ignore")
             if stdout.channel.recv_stderr_ready():
                 ret["stderr"] += stdout.channel.recv_stderr(1024).decode(errors="ignore")
-            time.sleep(1)
+            time.sleep(0.3)
+
+            if time.time() - now > 25:
+                break
 
         ret["stdout"] += stdout.channel.recv(65535).decode(errors="ignore")
         ret["stderr"] += stdout.channel.recv_stderr(65535).decode(errors="ignore")
@@ -299,14 +303,10 @@ def ssh_exec(data_with_cmd):
         ret["stderr"] = ret["stderr"][:10]
         ret["stdout"] = ret["stdout"][:10]
         ret["ok"]      = '/usr/bin/wg-quick' in ret["stdout"]
+
+
     except Exception as e:
         ret["error"] = str(e)
-    finally:
-
-        try:
-            ssh.close()
-        except:
-            pass
     print(ret['ok'],ret['wg_server_public_ip'],'----------------->',ret["error"])
 
     return ret
