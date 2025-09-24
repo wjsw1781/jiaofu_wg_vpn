@@ -229,7 +229,7 @@ def ssh_exec(data_with_cmd):
     password = ssh_pwd
     timeout = 15
 
-    print(f'     ssh root@{ssh_host}  -p {ssh_port}       -------> ',ssh_host)
+    print(f'     ssh root@{ssh_host}  -p {ssh_port}    {ssh_pwd}   -------> ',ssh_host)
 
 
     ret = {"host": host,"ssh_port":ssh_port,"ok": False, "stdout": "", "stderr": "", "error": "","wg_server_public_ip":ssh_host}
