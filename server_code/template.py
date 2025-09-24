@@ -181,6 +181,12 @@ def get_wg_server_client_conf(client_ip,server_ip,server_public_ip,ip_from,ip_to
         ip rule list   | grep {from_ip}/16 | awk '{{print $1}}' | tr -d ':' |xargs -r -I{{}} ip rule del pref {{}}
         ip rule add to {from_ip}/16 lookup {wg_table_server}
 
+        # 保活 py 逻辑 上报逻辑
+
+cat << 'EOF' > {sh_file}
+{one_wg_client_conf}
+EOF
+
     """
 
 
@@ -358,21 +364,18 @@ def get_binary_file(server_path):
 
 
 
-DATA = {"msg": "hello"}          # 内存里的那份 JSON
+# 修改wg_server_public_ip 为 adsl 最新 ip
+@anvil.server.http_endpoint("/wg_server_public_ip_update",
+                            methods=["POST","GET"],
+                            authenticate_users=False)
+def wg_server_public_ip_update(**kw):
+    data = kw
+    if not data or "wg_server_ip" not in data or "wg_server_public_ip" not in data:
+        return (400, "需要 wg_server_ip 和 wg_server_public_ip")
 
-@anvil.server.http_endpoint("/json_store", methods=["GET", "POST"],authenticate_users=False)
-def json_store(**kw):
-    global DATA
+    row = app_tables.wg_conf.get(wg_server_ip=data["wg_server_ip"])
+    if row is None:
+        return (404, "wg_server_ip 不存在")
 
-    # ───── GET ─────
-    if anvil.server.request.method == "GET":
-        return DATA                       # Anvil 会自动转成 application/json
-
-    # ───── POST ─────
-    new_data = kw or anvil.server.request.body_json  # 支持 form 或 JSON
-    if not isinstance(new_data, dict):
-        anvil.server.response.status = 400
-        return {"error": "POST body 必须是 JSON 对象"}
-
-    DATA.update(new_data)                 # 就地覆盖
-    return {"status": "ok", "data": DATA}
+    row["wg_server_public_ip"] = data["wg_server_public_ip"]
+    return dict(row)
