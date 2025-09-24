@@ -35,7 +35,8 @@ class page_natip(page_natipTemplate):
         info = self.info.text
         rt_table_id_from = self.rt_table_id_from.text
         minipc_wifi_iplink_name = self.minipc_wifi_iplink_name.text or ""
-        
+        per_in_of_out = self.per_in_of_out.text
+
         
         
         used_ip_froms = []
@@ -71,7 +72,8 @@ class page_natip(page_natipTemplate):
                                      ip_use_to=available_to,
                                      wg_listen_port=available_port,
                                      minipc_wifi_iplink_name= minipc_wifi_iplink_name,
-                                     rt_table_id_from = rt_table_id_from
+                                     rt_table_id_from = rt_table_id_from,
+                                     per_in_of_out = per_in_of_out
                                     )
 
 
@@ -92,5 +94,9 @@ class page_natip(page_natipTemplate):
         self.repeating_panel_1.items = app_tables.nat_table.search() 
 
     def minipc_wifi_iplink_name_pressed_enter(self, **event_args):
+        """This method is called when the user presses Enter in this text box"""
+        pass
+
+    def per_in_of_out_pressed_enter(self, **event_args):
         """This method is called when the user presses Enter in this text box"""
         pass
