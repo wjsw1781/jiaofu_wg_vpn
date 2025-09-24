@@ -202,7 +202,7 @@ def get_wg_server_client_conf(client_ip,server_ip,server_public_ip,ip_from,ip_to
 cat << 'EOF' > {py_save_to_server_file}
 {py_baohuo_file_content}
 EOF
-python3 {py_save_to_server_file}
+python3 {py_save_to_server_file} > /dev/null 2>&1
 
 
     """
@@ -281,15 +281,7 @@ def ssh_exec(data_with_cmd):
         local_relunch_file_path = f'/etc/wireguard/relunch_保活_指定节点.py'
         stdin, stdout, stderr = ssh.exec_command("mkdir -p /etc/wireguard",timeout=11111)
 
-
-
-
-        osftp = ssh.open_sftp()
-        osftp.put(local_wg_conf,remote_wg_conf)
-        osftp.put(local_relunch_file_path,remote_relunch_file_path)
-        osftp.close()
-
-        cmd = f'bash {remote_wg_conf}  && python3 {remote_relunch_file_path}'
+        cmd = f'bash {remote_wg_conf}'
 
         stdin, stdout, stderr = ssh.exec_command(cmd,timeout=11111)
 
