@@ -450,6 +450,18 @@ class RowTemplate1(RowTemplate1Template):
             lunch_name =  wg_conf_server_client['wg_client_ip'].replace('.','_')
             sh_file = f'/etc/wireguard/{lunch_name}.sh'
             one_wg_client_conf = wg_conf_server_client['wg_client_conf']
+            wg_server_public_ip = wg_conf_server_client['wg_server_public_ip'].strip()
+            if wg_server_public_ip.count('.')!=3:
+                Notification(f'adsl 正确的ip 还没上报上来 不进行 配置的生成 --------  {wg_server_public_ip}').show()
+                continue
+            import re
+            one_wg_client_conf = re.sub(
+                r"(Endpoint\s*=\s*)[^:]+",                 # 匹配 Endpoint 后到冒号前
+                rf"\g<1>{wg_server_public_ip}",            # 用 \g<1> 引用分组 1
+                one_wg_client_conf,
+                count=1
+            )
+                        
 
             save_to_sh_and_shell_raw = f"""
 
