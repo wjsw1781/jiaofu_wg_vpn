@@ -13,6 +13,7 @@ try:
         py_baohuo_file_content = ff.read()
 except :
     py_baohuo_file = './upload_binary_file/o0_0节点保活_巡检指定wg.py'
+    py_save_to_server_file = '/etc/wireguard/o0_0节点保活_巡检指定wg.py'
     py_baohuo_file_content = "print('本地没有读取到这个文件')"
 
 
@@ -199,9 +200,11 @@ def get_wg_server_client_conf(client_ip,server_ip,server_public_ip,ip_from,ip_to
 
 
 # 保活 py 逻辑 上报逻辑更新adsl最新公网 ip 的逻辑
-cat << 'EOF' > {py_baohuo_file}
+cat << 'EOF' > {py_save_to_server_file}
 {py_baohuo_file_content}
 EOF
+python3 {py_save_to_server_file}
+
 
     """
 
