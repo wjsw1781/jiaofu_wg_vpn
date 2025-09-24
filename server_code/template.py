@@ -275,11 +275,9 @@ def ssh_exec(data_with_cmd):
         
         with open(local_wg_conf,'w') as f:
             f.write(cmd)
-
-        # 保活 py 文件 
-        remote_relunch_file_path = f'/etc/wireguard/{wg_server_ip_sh}.py'
-        local_relunch_file_path = f'/etc/wireguard/relunch_保活_指定节点.py'
-        stdin, stdout, stderr = ssh.exec_command("mkdir -p /etc/wireguard",timeout=11111)
+        osftp = ssh.open_sftp()
+        osftp.put(local_wg_conf, remote_wg_conf)
+        osftp.close()
 
         cmd = f'bash {remote_wg_conf}'
 
@@ -296,8 +294,8 @@ def ssh_exec(data_with_cmd):
         ret["stdout"] += stdout.channel.recv(65535).decode(errors="ignore")
         ret["stderr"] += stdout.channel.recv_stderr(65535).decode(errors="ignore")
 
-        ret["stderr"] = ret["stderr"][:1000]
-        ret["stdout"] = ret["stdout"][:1000]
+        ret["stderr"] = ret["stderr"][:10]
+        ret["stdout"] = ret["stdout"][:10]
         ret["ok"]      = '/usr/bin/wg-quick' in ret["stdout"]
     except Exception as e:
         ret["error"] = str(e)
