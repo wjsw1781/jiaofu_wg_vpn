@@ -215,22 +215,24 @@ def get_wg_server_client_conf(client_ip,server_ip,server_public_ip,ip_from,ip_to
 @anvil.server.callable
 def ssh_exec(data_with_cmd):
     import paramiko    ,time,os
-    wg_server_public_ip = data_with_cmd["wg_server_public_ip"]
+    ssh_pwd = data_with_cmd["ssh_pwd"]
+    ssh_host = data_with_cmd["ssh_host"]
+    ssh_port = data_with_cmd["ssh_port"]
     wg_server_ip = data_with_cmd["wg_server_ip"]
     
     cmd = data_with_cmd["wg_server_conf"]
 
-    print(f'     ssh root@{wg_server_public_ip}         -------> ',wg_server_public_ip)
+    print(f'     ssh root@{ssh_host}         -------> ',ssh_host)
 
-    host = wg_server_public_ip
-    port =22
+    host = ssh_host
+    port = ssh_port
     user = "root"
-    password = "Spider666Linux"
+    password = ssh_pwd
     timeout = 15
 
 
 
-    ret = {"host": host, "ok": False, "stdout": "", "stderr": "", "error": "","wg_server_public_ip":wg_server_public_ip}
+    ret = {"host": host, "ok": False, "stdout": "", "stderr": "", "error": "","wg_server_public_ip":ssh_host}
 
     ssh = paramiko.SSHClient()
 
