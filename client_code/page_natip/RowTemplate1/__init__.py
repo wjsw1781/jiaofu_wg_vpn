@@ -108,28 +108,6 @@ def parse_csv(text):
   rows.append(line)
   return rows
 
-
-def is_public_ip(s):
-    parts = s.split('.')
-    if len(parts) != 4:                     # 不是 IPv4 4 段
-        return False
-    try:
-        nums = [int(p) for p in parts]
-    except:
-        return False                          # 有非数字
-    if any(n < 0 or n > 255 for n in nums): # 范围非法
-        return False
-
-    # 过滤常见私网段
-    if nums[0] == 10:
-        return False
-    if nums[0] == 172 and 16 <= nums[1] <= 31:
-        return False
-    if nums[0] == 192 and nums[1] == 168:
-        return False
-
-    return True
-    
 class RowTemplate1(RowTemplate1Template):
     def __init__(self, **properties):
         # Set Form properties and Data Bindings.
@@ -281,19 +259,51 @@ class RowTemplate1(RowTemplate1Template):
 
             
     def file_loader_1_change(self, file, **event_args):
-
+        import re
         # 读取 CSV 内容（假设是 UTF-8；否则先 file.content_type 判断再选编码）
         text = file.get_bytes().decode('utf-8', errors='ignore')
 
         # ② 调我们自己写的 parse_csv
         rows = parse_csv(text)
         # 取每行第一列作为 server_ip，过滤掉表头（若有）
-        ips = []
-        for i, line in enumerate(rows):
-            cands = [c.strip('" ') for c in line if is_public_ip(c.strip('" '))]
-            if cands:
-                ips.append(cands[0])     
+
+        def pick(col_name, extra=()):
+            dd = DropDown(items=list(extra)+headers, include_placeholder=True,placeholder=f"请选择 {col_name} 列")
+            alert(dd, title=f"{col_name} 列？", buttons=[("确定", True)])
+            return None if dd.selected_value in extra else headers.index(dd.selected_value)
         
+        headers, data = rows[0], rows[1:]                  # rows 是你 parse_csv 得到的
+        ip_i  = pick("公网 IP")
+        pt_i  = pick("端口", extra=("默认22",))
+        pw_i  = pick("密码", extra=("默认Spider666Linux",))
+        
+        ips, ports, pwds = [], [], []
+        for r in data:
+            # ip 
+            if ':' in r[ip_i]:
+                ip, port = r[ip_i].split(':')[0],r[ip_i].split(':')[1]
+            else:
+                ip = r[ip_i]
+            # port
+            if pt_i is not None:
+                if ':' in r[pt_i]:
+                    port =r[pt_i].split(':')[1]
+                else:
+                    port =r[pt_i]
+
+            else:
+                port = 22
+                
+            # 密码
+            if pw_i is not None:
+                pwd = r[pw_i]
+            else:
+                pwd = 'Spider666Linux'
+                
+            ips.append(ip)
+            ports.append(port)
+            pwds.append(pwd)
+            
         if not ips:
             alert("CSV 文件中未找到合法的公网 IP！")
             return
