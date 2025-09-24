@@ -331,12 +331,13 @@ class RowTemplate1(RowTemplate1Template):
     def client_down_click(self, **event_args):
         ip_to  = self.item['ip_use_to']
         minipc_wifi_iplink_name = self.item['minipc_wifi_iplink_name']
+        per_in_of_out = self.item['per_in_of_out']
         
         wg_client_ips    = [r['wg_client_ip'] for r in app_tables.wg_conf.search(ip_to=ip_to)]
         # 扩充手机路由规则    获取所有 client ip 进行扩充 一对 5 占用补充 phone 手机 ip 准备 ip范围   
         
         now_phone = [r for r in app_tables.wg_ip_rule.search(for_key_ip_use_to_wg_16=ip_to)]
-        phone_per_cli  = 5                                            # 1 : 5
+        phone_per_cli  = int(per_in_of_out)                          # 1 : 5
         cursor         = ip_to_int(now_phone[0]['ip_from_phone'])
         cursor += 1
 

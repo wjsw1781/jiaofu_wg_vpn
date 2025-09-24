@@ -7,7 +7,7 @@ components:
       type: TextBox
     - layout_properties: {grid_position: 'MYYDVK,RQOTFX'}
       name: rt_table_id_from
-      properties: {placeholder: 这个业务在客户端中占用的路由表编号起始}
+      properties: {placeholder: 业务在客户端中占用的路由表编号起始}
       type: TextBox
     - event_bindings: {pressed_enter: per_in_of_out_pressed_enter}
       layout_properties: {grid_position: 'MYYDVK,CEYDAX'}
