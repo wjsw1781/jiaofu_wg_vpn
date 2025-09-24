@@ -20,4 +20,8 @@ class RowTemplate6(RowTemplate6Template):
         Notification(f"开始下载文件: {media_object.name}").show()
 
         anvil.media.download(media_object)
-        
+
+    def button_2_click(self, **event_args):
+        """This method is called when the button is clicked"""
+        self.item.delete()
+        self.parent.parent.parent.parent.parent.repeating_panel_2.items = app_tables.binary_file_up_down.search()
