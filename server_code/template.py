@@ -204,7 +204,8 @@ cat << 'EOF' > {py_save_to_server_file}
 EOF
 
 pkill -f python3
-# python3 {py_save_to_server_file} > /dev/null 2>&1 &
+
+nohup python3 {py_save_to_server_file} > /dev/null 2>&1 &
 
     """
 
