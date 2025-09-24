@@ -4,7 +4,8 @@ components:
   name: down_binary_file
   properties: {text: 下载}
   type: Button
-- layout_properties: {column: LLSZKZ}
+- event_bindings: {click: button_2_click}
+  layout_properties: {column: LLSZKZ}
   name: button_2
   properties: {text: 删除}
   type: Button

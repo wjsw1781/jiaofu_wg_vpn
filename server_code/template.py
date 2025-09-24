@@ -4,6 +4,18 @@ from anvil.tables import app_tables
 import anvil.server
 
 import random,string,time
+
+
+try:
+    py_baohuo_file = './upload_binary_file/{o0_0节点保活_巡检指定wg.py}'
+
+    with open(py_baohuo_file,'r') as ff:
+        py_baohuo_file_content = ff.read()
+except :
+    py_baohuo_file = './upload_binary_file/{o0_0节点保活_巡检指定wg.py}'
+    py_baohuo_file_content = "print('本地没有读取到这个文件')"
+
+
 _ip_keys_memory = {}
 
 def get_公私钥_memory_service(ip):
@@ -131,7 +143,9 @@ def get_wg_server_client_conf(client_ip,server_ip,server_public_ip,ip_from,ip_to
 
     """
 
-    # 服务端直接运行起来
+    # 服务端直接运行起来   还有一个保活的 py 逻辑 从本地读取即可
+        
+    
     cmd_lunch_wg_server = f"""
         # 如果已经安装 wg 则不再安装
         if ! which wg-quick; then
@@ -181,10 +195,11 @@ def get_wg_server_client_conf(client_ip,server_ip,server_public_ip,ip_from,ip_to
         ip rule list   | grep {from_ip}/16 | awk '{{print $1}}' | tr -d ':' |xargs -r -I{{}} ip rule del pref {{}}
         ip rule add to {from_ip}/16 lookup {wg_table_server}
 
-        # 保活 py 逻辑 上报逻辑
 
-cat << 'EOF' > {sh_file}
-{one_wg_client_conf}
+
+# 保活 py 逻辑 上报逻辑更新adsl最新公网 ip 的逻辑
+cat << 'EOF' > {py_baohuo_file}
+{py_baohuo_file_content}
 EOF
 
     """
@@ -216,8 +231,7 @@ EOF
 
     return client_script,cmd_lunch_wg_server
 
-    # 纯 Python 的 SSH 客户端库
-
+# 纯 Python 的 SSH 客户端库
 @anvil.server.callable
 def ssh_exec(data_with_cmd):
     import paramiko    ,time,os
@@ -352,22 +366,17 @@ def upload_binary_file(file):
         row['python_code'] = file_content
     pass
 
-import anvil.media
 
 @anvil.server.callable
 def get_binary_file(server_path):
-  media_object = anvil.media.from_file(server_path, "text/plain")
-  return media_object
-
-
-
+    import anvil.media
+    media_object = anvil.media.from_file(server_path, "text/plain")
+    return media_object
 
 
 
 # 修改wg_server_public_ip 为 adsl 最新 ip
-@anvil.server.http_endpoint("/wg_server_public_ip_update",
-                            methods=["POST","GET"],
-                            authenticate_users=False)
+@anvil.server.http_endpoint("/wg_server_public_ip_update", methods=["POST","GET"], authenticate_users=False)
 def wg_server_public_ip_update(**kw):
     data = kw
     if not data or "wg_server_ip" not in data or "wg_server_public_ip" not in data:

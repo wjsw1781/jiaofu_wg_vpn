@@ -42,7 +42,6 @@ class page_use_sh_py_tools(page_use_sh_py_toolsTemplate):
                 # 调用服务器函数上传文件
                 anvil.server.call('upload_binary_file', file)
                 self.repeating_panel_2.items = app_tables.binary_file_up_down.search()
-
                 Notification(f"文件 '{file.name}' 上传成功！").show()
                 
             except Exception as e:
