@@ -240,7 +240,7 @@ class RowTemplate1(RowTemplate1Template):
             datas_conf = list(map(lambda x : dict(x) ,datas_conf ))
             txt = list_of_dicts_to_csv_string_readable(datas_conf)
 
-            csv_bytes =  txt.encode("utf-8") 
+            csv_bytes ="\ufeff" + txt.encode()
 
             alert(f"已成功生成 {len(datas_conf)} 条记录。", title="完成")
 
