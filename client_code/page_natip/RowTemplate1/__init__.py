@@ -165,7 +165,7 @@ class RowTemplate1(RowTemplate1Template):
         wg_listen_port =self.item['wg_listen_port']
         rt_table_id_from =self.item['rt_table_id_from']
         minipc_wifi_iplink_name = self.item['minipc_wifi_iplink_name']
-
+        wg_server_public_ip =  self.item['wg_server_public_ip'] or '1'
         
         RT_table_ID = int(rt_table_id_from)
 
@@ -203,7 +203,7 @@ class RowTemplate1(RowTemplate1Template):
                 self.server_ip_index += 1   
             except :
                 break
-            all_conf.append([client_ip,server_ip,server_public_ip,ip_from,ip_to,wg_listen_port,RT_table_ID,ssh_host,ssh_port,ssh_pwd])
+            all_conf.append([client_ip,server_ip,server_public_ip,ip_from,ip_to,wg_listen_port,RT_table_ID,ssh_host,ssh_port,ssh_pwd,wg_server_public_ip])
     
             # 下一 /30
             current += 4
@@ -211,9 +211,9 @@ class RowTemplate1(RowTemplate1Template):
     
         def thread_run_one_conf(one_conf):
             
-            client_ip,server_ip,server_public_ip,ip_from,ip_to,wg_listen_port,RT_table_ID,ssh_host,ssh_port,ssh_pwd = one_conf
+            client_ip,server_ip,server_public_ip,ip_from,ip_to,wg_listen_port,RT_table_ID,ssh_host,ssh_port,ssh_pwd,wg_server_public_ip = one_conf
     
-            client_conf,server_conf= anvil.server.call('get_wg_server_client_conf',client_ip,server_ip,server_public_ip,ip_from,ip_to,wg_listen_port,RT_table_ID)
+            client_conf,server_conf= anvil.server.call('get_wg_server_client_conf',client_ip,server_ip,server_public_ip,ip_from,ip_to,wg_listen_port,RT_table_ID,wg_server_public_ip)
     
             app_tables.wg_conf.add_row(
                 wg_server_ip        = server_ip,
