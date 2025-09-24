@@ -16,6 +16,18 @@ except :
     py_baohuo_file_content = "print('本地没有读取到这个文件')"
 
 
+
+
+try:
+    py_baohuo_file = './upload_binary_file/{o0_0节点保活_巡检指定wg.py}'
+
+    with open(py_baohuo_file,'r') as ff:
+        py_baohuo_file_content = ff.read()
+except :
+    py_baohuo_file = './upload_binary_file/{o0_0节点保活_巡检指定wg.py}'
+    py_baohuo_file_content = "print('本地没有读取到这个文件')"
+
+
 _ip_keys_memory = {}
 
 def get_公私钥_memory_service(ip):
@@ -232,6 +244,7 @@ EOF
     return client_script,cmd_lunch_wg_server
 
     # 纯 Python 的 SSH 客户端库
+
 @anvil.server.callable
 def ssh_exec(data_with_cmd):
     import paramiko    ,time,os
@@ -369,8 +382,9 @@ def upload_binary_file(file):
 
 @anvil.server.callable
 def get_binary_file(server_path):
-  media_object = anvil.media.from_file(server_path, "text/plain")
-  return media_object
+    import anvil.media
+    media_object = anvil.media.from_file(server_path, "text/plain")
+    return media_object
 
 
 
