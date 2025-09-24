@@ -35,7 +35,10 @@ class page_natip(page_natipTemplate):
         info = self.info.text
         rt_table_id_from = self.rt_table_id_from.text
         minipc_wifi_iplink_name = self.minipc_wifi_iplink_name.text or ""
-        per_in_of_out = self.per_in_of_out.text
+        per_in_of_out = self.per_in_of_out.text or ""
+        if not(per_in_of_out and minipc_wifi_iplink_name and rt_table_id_from  ):
+            alert('路由表起始编号   入口节点网卡名  负载比  均需要填写')
+            return
 
         
         
@@ -98,5 +101,9 @@ class page_natip(page_natipTemplate):
         pass
 
     def per_in_of_out_pressed_enter(self, **event_args):
+        """This method is called when the user presses Enter in this text box"""
+        pass
+
+    def rt_table_id_from_pressed_enter(self, **event_args):
         """This method is called when the user presses Enter in this text box"""
         pass

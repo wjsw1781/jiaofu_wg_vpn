@@ -352,3 +352,27 @@ import anvil.media
 def get_binary_file(server_path):
   media_object = anvil.media.from_file(server_path, "text/plain")
   return media_object
+
+
+
+
+
+
+DATA = {"msg": "hello"}          # 内存里的那份 JSON
+
+@anvil.server.http_endpoint("/json_store", methods=["GET", "POST"],authenticate_users=False)
+def json_store(**kw):
+    global DATA
+
+    # ───── GET ─────
+    if anvil.server.request.method == "GET":
+        return DATA                       # Anvil 会自动转成 application/json
+
+    # ───── POST ─────
+    new_data = kw or anvil.server.request.body_json  # 支持 form 或 JSON
+    if not isinstance(new_data, dict):
+        anvil.server.response.status = 400
+        return {"error": "POST body 必须是 JSON 对象"}
+
+    DATA.update(new_data)                 # 就地覆盖
+    return {"status": "ok", "data": DATA}

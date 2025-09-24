@@ -158,7 +158,8 @@ class RowTemplate1(RowTemplate1Template):
         if self.server_ips ==[]:
             alert("请上传该业务的节点文件 才能进行后续配置")
             return
-    
+        
+
         ip_from = self.item['ip_use_from']
         ip_to   = self.item['ip_use_to']
         wg_listen_port =self.item['wg_listen_port']
@@ -168,6 +169,11 @@ class RowTemplate1(RowTemplate1Template):
         
         RT_table_ID = int(rt_table_id_from)
 
+        total_conf =  app_tables.wg_conf.search(ip_to = ip_to)
+        total_len_conf = len(total_conf)
+        for INDEX , row in enumerate(total_conf):
+            row.delete()
+            Notification(f'删除旧配置。。。。。。。{INDEX}/{total_len_conf}').show()
 
         
         max_pairs  = 2000
@@ -209,38 +215,20 @@ class RowTemplate1(RowTemplate1Template):
     
             client_conf,server_conf= anvil.server.call('get_wg_server_client_conf',client_ip,server_ip,server_public_ip,ip_from,ip_to,wg_listen_port,RT_table_ID)
     
-            row = app_tables.wg_conf.search(wg_server_ip=server_ip)
+            app_tables.wg_conf.add_row(
+                wg_server_ip        = server_ip,
+                wg_client_ip        = client_ip,
+                wg_server_conf      = server_conf,
+                wg_client_conf      = client_conf,
+                wg_server_public_ip = server_public_ip,
+                ip_to = ip_to,
+                minipc_wifi_iplink_name =minipc_wifi_iplink_name,
+                wg_listen_port = str(wg_listen_port),
 
-            if len(row):  
-                row =app_tables.wg_conf.get(wg_server_ip=server_ip)
-                row['wg_client_ip']        = client_ip
-                row['wg_server_conf']      = server_conf
-                row['wg_client_conf']      = client_conf
-                row['wg_server_public_ip'] = server_public_ip
-                row['ip_to'] = ip_to
-                row['minipc_wifi_iplink_name'] = minipc_wifi_iplink_name
-                row['wg_listen_port'] =  str(wg_listen_port)
-                
-                row['ssh_host'] =  str(ssh_host)
-                row['ssh_port'] =  str(ssh_port)
-                row['ssh_pwd'] =  str(ssh_pwd)
-                
-            else:                                                 # 不存在 → 新增
-                
-                app_tables.wg_conf.add_row(
-                    wg_server_ip        = server_ip,
-                    wg_client_ip        = client_ip,
-                    wg_server_conf      = server_conf,
-                    wg_client_conf      = client_conf,
-                    wg_server_public_ip = server_public_ip,
-                    ip_to = ip_to,
-                    minipc_wifi_iplink_name =minipc_wifi_iplink_name,
-                    wg_listen_port = str(wg_listen_port),
-
-                    ssh_host = str(ssh_host),
-                    ssh_port =  str(ssh_port),
-                    ssh_pwd=  str(ssh_pwd),
-                )
+                ssh_host = str(ssh_host),
+                ssh_port =  str(ssh_port),
+                ssh_pwd=  str(ssh_pwd),
+            )
     
             all_conf_after_threads.append(server_conf)
     
@@ -288,7 +276,7 @@ class RowTemplate1(RowTemplate1Template):
         
         ips, ports, pwds = [], [], []
         for r in data:
-            if len(r)<pw_i or len(r)<ip_i or len(r)<pt_i :
+            if ip_i and  len(r)<ip_i :
                 continue
             # ip 
             if ':' in r[ip_i]:
@@ -323,20 +311,21 @@ class RowTemplate1(RowTemplate1Template):
         triples = list(zip(ips, ports, pwds)) 
         alert(f"获取到的公网 ip---->   {triples}")
         
-        self.server_ips = triples       # 保存到 form 的实例变量
+        self.server_ips = list(set(self.server_ips + triples ))     # 保存到 form 的实例变量
         self.server_ip_index = 0    # 当前已分配到第几个
         
-        alert(f"已载入 {len(ips)} 个服务器公网 IP。", title="上传成功")
+        alert(f"当前文件载入 {len(ips)} 个服务器公网 IP。 累积倒入  {len( self.server_ips)}", title="上传成功")
 
     def client_down_click(self, **event_args):
         ip_to  = self.item['ip_use_to']
         minipc_wifi_iplink_name = self.item['minipc_wifi_iplink_name']
+        per_in_of_out = self.item['per_in_of_out']
         
         wg_client_ips    = [r['wg_client_ip'] for r in app_tables.wg_conf.search(ip_to=ip_to)]
         # 扩充手机路由规则    获取所有 client ip 进行扩充 一对 5 占用补充 phone 手机 ip 准备 ip范围   
         
         now_phone = [r for r in app_tables.wg_ip_rule.search(for_key_ip_use_to_wg_16=ip_to)]
-        phone_per_cli  = 5                                            # 1 : 5
+        phone_per_cli  = int(per_in_of_out)                          # 1 : 5
         cursor         = ip_to_int(now_phone[0]['ip_from_phone'])
         cursor += 1
 
@@ -366,7 +355,6 @@ class RowTemplate1(RowTemplate1Template):
         # dns 操作 
         DNSMASQ_CONF = "/etc/dnsmasq.conf"
         wifi_网卡 = minipc_wifi_iplink_name or  'enp3s0' 
-        # enp3s0  
         系统自带dns_file = "/etc/resolv.conf"
 
         系统自带dns_conf = """
