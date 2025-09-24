@@ -222,7 +222,6 @@ def ssh_exec(data_with_cmd):
     
     cmd = data_with_cmd["wg_server_conf"]
 
-    print(f'     ssh root@{ssh_host}         -------> ',ssh_host)
 
     host = ssh_host
     port = ssh_port
@@ -230,9 +229,10 @@ def ssh_exec(data_with_cmd):
     password = ssh_pwd
     timeout = 15
 
+    print(f'     ssh root@{ssh_host}  -p {ssh_port}       -------> ',ssh_host)
 
 
-    ret = {"host": host, "ok": False, "stdout": "", "stderr": "", "error": "","wg_server_public_ip":ssh_host}
+    ret = {"host": host,"ssh_port":ssh_port,"ok": False, "stdout": "", "stderr": "", "error": "","wg_server_public_ip":ssh_host}
 
     ssh = paramiko.SSHClient()
 
