@@ -279,13 +279,15 @@ def ssh_exec(data_with_cmd):
         
 
 
-        # wg 服务端 sh 拉起文件
+    
         local_wg_conf = f'./wg_conf/{wg_server_ip_sh}.sh'
         remote_wg_conf = f'/etc/wireguard/{wg_server_ip_sh}.sh'
         os.makedirs(os.path.dirname(local_wg_conf), exist_ok=True)
-        
+        stdin, stdout, stderr = ssh.exec_command("mkdir -p /etc/wireguard/", timeout=10)
+
         with open(local_wg_conf,'w') as f:
             f.write(cmd)
+            
         osftp = ssh.open_sftp()
         osftp.put(local_wg_conf, remote_wg_conf)
         osftp.close()
@@ -310,7 +312,7 @@ def ssh_exec(data_with_cmd):
 
         ret["stderr"] = ret["stderr"]
         ret["stdout"] = ret["stdout"]
-        ret["ok"]      = '/usr/bin/wg-quick' in ret["stdout"]
+        ret["ok"]      = wg_server_ip_sh in ret["stdout"]
 
 
     except Exception as e:
