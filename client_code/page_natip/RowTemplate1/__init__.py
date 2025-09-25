@@ -195,7 +195,7 @@ class RowTemplate1(RowTemplate1Template):
             server_ip = int_to_ip(server_ip_int)
             try:
                 server_public_ip = self.server_ips[self.server_ip_index][0]
-                
+                wg_server_public_ip = server_public_ip
                 ssh_port = self.server_ips[self.server_ip_index][1]
                 ssh_pwd = self.server_ips[self.server_ip_index][2]
                 ssh_host = self.server_ips[self.server_ip_index][0]
