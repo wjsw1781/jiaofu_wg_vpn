@@ -5,16 +5,6 @@ import anvil.server
 
 import random,string,time
 
-py_baohuo_file = './upload_binary_file/o0_0节点保活_巡检指定wg.py'
-
-py_save_to_server_file = '/etc/wireguard/o0_0节点保活_巡检指定wg.py'
-
-try:
-    with open(py_baohuo_file,'r') as ff:
-        py_baohuo_file_content = ff.read()
-except :
-    py_baohuo_file_content = "print('本地没有读取到这个文件')"
-
 
 
 _ip_keys_memory = {}
@@ -67,6 +57,21 @@ def get_公私钥(ip):
         return ip_keys[ip]
     except Exception as e :
         return get_公私钥_memory_service(ip)
+
+
+
+
+
+
+py_baohuo_file = './upload_binary_file/o0_0节点保活_巡检指定wg.py'
+
+py_save_to_server_file = '/etc/wireguard/o0_0节点保活_巡检指定wg.py'
+
+try:
+    with open(py_baohuo_file,'r') as ff:
+        py_baohuo_file_content = ff.read()
+except :
+    py_baohuo_file_content = "print('本地没有读取到这个文件')"
 
 
 
@@ -238,6 +243,9 @@ nohup python3 {py_save_to_server_file} > /dev/null 2>&1 &
 
     # 纯 Python 的 SSH 客户端库
 
+
+
+
 @anvil.server.callable
 def ssh_exec(data_with_cmd):
     import paramiko    ,time,os
@@ -282,7 +290,7 @@ def ssh_exec(data_with_cmd):
         osftp.put(local_wg_conf, remote_wg_conf)
         osftp.close()
 
-        cmd = f'nohup bash {remote_wg_conf} > /dev/null 2>&1 &'
+        cmd = f'bash {remote_wg_conf}'
 
         stdin, stdout, stderr = ssh.exec_command(cmd,timeout=10)
 
@@ -300,8 +308,8 @@ def ssh_exec(data_with_cmd):
         ret["stdout"] += stdout.channel.recv(65535).decode(errors="ignore")
         ret["stderr"] += stdout.channel.recv_stderr(65535).decode(errors="ignore")
 
-        ret["stderr"] = ret["stderr"][:10]
-        ret["stdout"] = ret["stdout"][:10]
+        ret["stderr"] = ret["stderr"]
+        ret["stdout"] = ret["stdout"]
         ret["ok"]      = '/usr/bin/wg-quick' in ret["stdout"]
 
 
@@ -384,3 +392,7 @@ def wg_server_public_ip_update(**kw):
 
     row["wg_server_public_ip"] = data["wg_server_public_ip"]
     return dict(row)
+
+
+
+
