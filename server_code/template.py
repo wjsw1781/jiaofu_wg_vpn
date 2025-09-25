@@ -287,7 +287,7 @@ def ssh_exec(data_with_cmd):
 
         with open(local_wg_conf,'w') as f:
             f.write(cmd)
-            
+
         osftp = ssh.open_sftp()
         osftp.put(local_wg_conf, remote_wg_conf)
         osftp.close()
@@ -317,7 +317,7 @@ def ssh_exec(data_with_cmd):
 
     except Exception as e:
         ret["error"] = str(e)
-    print(ret['ok'],ret['wg_server_public_ip'],'----------------->',ret["error"])
+    print(ret['ok'],ret['wg_server_public_ip'],'----------------->',ret["error"],ret['stdout'])
 
     return ret
 
