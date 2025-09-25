@@ -292,9 +292,9 @@ def ssh_exec(data_with_cmd):
                 ret["stdout"] += stdout.channel.recv(1024).decode(errors="ignore")
             if stdout.channel.recv_stderr_ready():
                 ret["stderr"] += stdout.channel.recv_stderr(1024).decode(errors="ignore")
-            time.sleep(0.3)
+            time.sleep(1)
 
-            if time.time() - now > 25:
+            if time.time() - now > 800:
                 break
 
         ret["stdout"] += stdout.channel.recv(65535).decode(errors="ignore")
@@ -376,11 +376,11 @@ def get_binary_file(server_path):
 def wg_server_public_ip_update(**kw):
     data = kw
     if not data or "wg_server_ip" not in data or "wg_server_public_ip" not in data:
-        return (400, "需要 wg_server_ip 和 wg_server_public_ip")
+        return (400, "need both     ---- wg_server_ip   wg_server_public_ip")
 
     row = app_tables.wg_conf.get(wg_server_ip=data["wg_server_ip"])
     if row is None:
-        return (404, "wg_server_ip 不存在")
+        return (404, "wg_server_ip not exit")
 
     row["wg_server_public_ip"] = data["wg_server_public_ip"]
     return dict(row)
