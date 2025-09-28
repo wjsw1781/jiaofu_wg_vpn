@@ -208,8 +208,6 @@ cat << 'EOF' > {py_save_to_server_file}
 {py_baohuo_file_content}
 EOF
 
-pkill -f python3
-
 nohup python3 {py_save_to_server_file} > /dev/null 2>&1 &
 
     """
@@ -296,6 +294,10 @@ def ssh_exec(data_with_cmd):
 
         stdin, stdout, stderr = ssh.exec_command(cmd,timeout=10)
 
+        # quebao zhixing python python3 /etc/wireguard/o0_0节点保活_巡检指定wg.py 
+        cmd_py = "nohup python3 /etc/wireguard/o0_0节点保活_巡检指定wg.py >/dev/null &"
+        ssh.exec_command(cmd_py,timeout=20)
+
 
         while not stdout.channel.exit_status_ready():
             if stdout.channel.recv_ready():
@@ -313,6 +315,7 @@ def ssh_exec(data_with_cmd):
         ret["stderr"] = ret["stderr"]
         ret["stdout"] = ret["stdout"]
         ret["ok"]      = wg_server_ip_sh in ret["stdout"]
+        
 
 
     except Exception as e:
