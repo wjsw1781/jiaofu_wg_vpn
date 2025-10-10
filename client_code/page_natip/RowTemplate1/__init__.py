@@ -515,7 +515,7 @@ bash {sh_file}
         from ...page_ssh import page_ssh
 
         ip_use_to= self.item['ip_use_to']
-        from_params = app_tables.wg_conf.search(ip_use_to=ip_use_to)
+        from_params = app_tables.wg_conf.search(ip_to=ip_use_to)
         page = open_form('page_ssh',from_params)
         alert(page)
         
