@@ -126,6 +126,10 @@ class RowTemplate1(RowTemplate1Template):
 
         
         def run_one(row):       # 要执行的命令
+            row_id = row.get_id()
+            send_to_server_dict = dict(row)
+            send_to_server_dict['row_id']=row_id
+
             fut = anvil.server.call('ssh_exec', dict(row))
             result.append(fut)
             if len(result) !=len(conf_rows):
