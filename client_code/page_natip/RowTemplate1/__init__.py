@@ -509,3 +509,14 @@ bash {sh_file}
             Notification(f'业务删除引发配置删除----进度----{index}/{need_delete_num}').show()
             line.delete()
 
+    def open_this_wg_conf_status_click(self, **event_args):
+        """This method is called when the button is clicked"""
+        
+        from ...page_ssh import page_ssh
+
+        ip_use_to= self.item['ip_use_to']
+        from_params = app_tables.wg_conf.search(ip_use_to=ip_use_to)
+        page = open_form('page_ssh',from_params)
+        alert(page)
+        
+
