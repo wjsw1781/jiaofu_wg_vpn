@@ -394,18 +394,19 @@ def get_binary_file(server_path):
 
 
 # 修改wg_server_public_ip 为 adsl 最新 ip
-# @anvil.server.http_endpoint("/wg_server_public_ip_update", methods=["POST","GET"], authenticate_users=False)
-# def wg_server_public_ip_update(**kw):
-#     data = kw
-#     if not data or "wg_server_ip" not in data or "wg_server_public_ip" not in data:
-#         return (400, "need both     ---- wg_server_ip   wg_server_public_ip")
+@anvil.server.http_endpoint("/wg_server_public_ip_update", methods=["POST","GET"], authenticate_users=False)
+def wg_server_public_ip_update(**kw):
+    # data = kw
+    # if not data or "wg_server_ip" not in data or "wg_server_public_ip" not in data:
+    #     return (400, "need both     ---- wg_server_ip   wg_server_public_ip")
 
-#     row = app_tables.wg_conf.get(wg_server_ip=data["wg_server_ip"])
-#     if row is None:
-#         return (404, "wg_server_ip not exit")
+    # row = app_tables.wg_conf.get(wg_server_ip=data["wg_server_ip"])
+    # if row is None:
+    #     return (404, "wg_server_ip not exit")
 
-#     row["wg_server_public_ip"] = data["wg_server_public_ip"]
-#     return dict(row)
+    # row["wg_server_public_ip"] = data["wg_server_public_ip"]
+    # return dict(row)
+    return {}
 
 
 

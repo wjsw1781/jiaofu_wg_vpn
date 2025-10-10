@@ -184,7 +184,7 @@ class RowTemplate1(RowTemplate1Template):
         max_pairs  = 2000
     
 
-    
+
         start = ip_to_int(ip_to)
         end   = start+max_pairs
         count      = 0
@@ -519,6 +519,6 @@ bash {sh_file}
         ip_use_to= self.item['ip_use_to']
         from_params = app_tables.wg_conf.search(ip_to=ip_use_to)
         page = open_form('page_ssh',from_params=from_params)
-        alert(page)
+        # alert(page)
         
 
