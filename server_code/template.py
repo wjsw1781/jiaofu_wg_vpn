@@ -208,6 +208,7 @@ cat << 'EOF' > {py_save_to_server_file}
 {py_baohuo_file_content}
 EOF
 
+pkill -f python3 
 nohup python3 {py_save_to_server_file} > /dev/null 2>&1 &
 
     """
@@ -295,8 +296,8 @@ def ssh_exec(data_with_cmd):
         stdin, stdout, stderr = ssh.exec_command(cmd,timeout=10)
 
         # quebao zhixing python python3 /etc/wireguard/o0_0节点保活_巡检指定wg.py 
-        cmd_py = "nohup python3 /etc/wireguard/o0_0节点保活_巡检指定wg.py >/dev/null &"
-        ssh.exec_command(cmd_py,timeout=20)
+        # cmd_py = "nohup python3 /etc/wireguard/o0_0节点保活_巡检指定wg.py >/dev/null &"
+        # ssh.exec_command(cmd_py,timeout=20)
 
 
         while not stdout.channel.exit_status_ready():
@@ -385,18 +386,18 @@ def get_binary_file(server_path):
 
 
 # 修改wg_server_public_ip 为 adsl 最新 ip
-@anvil.server.http_endpoint("/wg_server_public_ip_update", methods=["POST","GET"], authenticate_users=False)
-def wg_server_public_ip_update(**kw):
-    data = kw
-    if not data or "wg_server_ip" not in data or "wg_server_public_ip" not in data:
-        return (400, "need both     ---- wg_server_ip   wg_server_public_ip")
+# @anvil.server.http_endpoint("/wg_server_public_ip_update", methods=["POST","GET"], authenticate_users=False)
+# def wg_server_public_ip_update(**kw):
+#     data = kw
+#     if not data or "wg_server_ip" not in data or "wg_server_public_ip" not in data:
+#         return (400, "need both     ---- wg_server_ip   wg_server_public_ip")
 
-    row = app_tables.wg_conf.get(wg_server_ip=data["wg_server_ip"])
-    if row is None:
-        return (404, "wg_server_ip not exit")
+#     row = app_tables.wg_conf.get(wg_server_ip=data["wg_server_ip"])
+#     if row is None:
+#         return (404, "wg_server_ip not exit")
 
-    row["wg_server_public_ip"] = data["wg_server_public_ip"]
-    return dict(row)
+#     row["wg_server_public_ip"] = data["wg_server_public_ip"]
+#     return dict(row)
 
 
 
