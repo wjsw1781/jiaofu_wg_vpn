@@ -249,6 +249,8 @@ nohup python3 {py_save_to_server_file} > /dev/null 2>&1 &
 def ssh_exec(data_with_cmd):
     import paramiko    ,time,os
     now = time.time()
+
+    print("  ---------------> ",data_with_cmd.keys())
     ssh_pwd = data_with_cmd["ssh_pwd"]
     ssh_host = data_with_cmd["ssh_host"]
     ssh_port = data_with_cmd["ssh_port"]

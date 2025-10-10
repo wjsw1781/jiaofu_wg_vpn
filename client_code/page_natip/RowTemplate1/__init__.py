@@ -326,7 +326,7 @@ class RowTemplate1(RowTemplate1Template):
         
         wg_client_ips_all_client    = [r['wg_client_ip'] for r in app_tables.wg_conf.search(ip_to=ip_to)]
         wg_client_ips    = [r['wg_client_ip'] for r in app_tables.wg_conf.search(ip_to=ip_to,wg_server_ok="")]
-        Notification(f'所有 client wg server 部署成功数量 {len(wg_client_ips)}   总数量{len(wg_client_ips_all_client)}  不成功的不再进行 client 的生成').show()
+        alert(f'所有 client wg server 部署成功数量 {len(wg_client_ips)}   总数量{len(wg_client_ips_all_client)}  不成功的不再进行 client 的生成')
         # 扩充手机路由规则    获取所有 client ip 进行扩充 一对 5 占用补充 phone 手机 ip 准备 ip范围   
         
         now_phone = [r for r in app_tables.wg_ip_rule.search(for_key_ip_use_to_wg_16=ip_to)]
@@ -337,7 +337,7 @@ class RowTemplate1(RowTemplate1Template):
         gateway_ip  = int_to_ip(cursor)
         
         info_template = now_phone[0]['info']
-        for index,cli_ip in enumerate(wg_client_ips):          # 遍历两个 WG-client IP
+        for index,cli_ip in enumerate(wg_client_ips):          # 遍历 WG-client IP
             for _ in range(phone_per_cli):    # 给每个 client 派 5 个手机 IP
                 cursor += 1
                 mobile_ip = int_to_ip(cursor)
@@ -446,9 +446,9 @@ class RowTemplate1(RowTemplate1Template):
             """
             all_rule.append(template)
 
-        # wg 客户端  拼接命令的同时 吧 sh 也进行保存到/etc/wiregard/*.sh
+        # wg 客户端 sh conf 生成 只要 wg_server_ok=""   拼接命令的同时 吧 sh 也进行保存到/etc/wiregard/*.sh
         wg_client_lunchs = []
-        for wg_conf_server_client in app_tables.wg_conf.search(ip_to=ip_to):
+        for wg_conf_server_client in app_tables.wg_conf.search(ip_to=ip_to,wg_server_ok=""):
             lunch_name =  wg_conf_server_client['wg_client_ip'].replace('.','_')
             sh_file = f'/etc/wireguard/{lunch_name}.sh'
             one_wg_client_conf = wg_conf_server_client['wg_client_conf']
