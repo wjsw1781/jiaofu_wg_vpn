@@ -28,5 +28,10 @@ components:
   name: acc_wg_client_use_server_ip
   properties: {text: 加速客户端}
   type: Button
+- event_bindings: {click: open_this_wg_conf_status_click}
+  layout_properties: {column: OUONTH}
+  name: open_this_wg_conf_status
+  properties: {text: 查看业务节点现状}
+  type: Button
 container: {type: DataRowPanel}
 is_package: true

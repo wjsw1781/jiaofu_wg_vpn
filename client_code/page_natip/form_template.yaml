@@ -46,6 +46,7 @@ components:
         - {data_key: minipc_wifi_iplink_name, expand: false, id: GYNFFB, title: minipc_wifi_iplink_name, width: 164.2109375}
         - {data_key: rt_table_id_from, id: JTJMAK, title: rt_table_id_from}
         - {data_key: column_1, id: VSXSPD, title: 加速客户端}
+        - {data_key: column_1, id: OUONTH, title: 查看现状}
         spacing_above: medium
         spacing_below: medium
       type: DataGrid
