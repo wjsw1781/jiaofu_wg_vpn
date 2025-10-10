@@ -321,7 +321,7 @@ def ssh_exec(data_with_cmd):
 
     except Exception as e:
         ret["error"] = str(e)
-    print(ret['ok'],ret['wg_server_public_ip'],'----------------->',ret["error"],ret['stdout'])
+    print(ret['ok'],ret['wg_server_public_ip'],'---------------------------------------------->',ret["error"],ret['stdout'])
 
     return ret
 
