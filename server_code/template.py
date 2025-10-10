@@ -243,18 +243,24 @@ nohup python3 {py_save_to_server_file} > /dev/null 2>&1 &
     # 纯 Python 的 SSH 客户端库
 
 
-
+from loguru import logger
 
 @anvil.server.callable
 def ssh_exec(data_with_cmd):
     import paramiko    ,time,os
     now = time.time()
 
-    print("  ---------------> ",data_with_cmd.keys())
+
+
+    row_id = data_with_cmd["row_id"]
     ssh_pwd = data_with_cmd["ssh_pwd"]
     ssh_host = data_with_cmd["ssh_host"]
     ssh_port = data_with_cmd["ssh_port"]
     wg_server_ip = data_with_cmd["wg_server_ip"]
+    logger.success(f'开始执行 ssh_exec  {row_id}')
+
+
+
     
     cmd = data_with_cmd["wg_server_conf"]
 
@@ -263,12 +269,12 @@ def ssh_exec(data_with_cmd):
     port = ssh_port
     user = "root"
     password = ssh_pwd
-    timeout = 23
+    timeout = 15
 
-    print(f'     ssh root@{ssh_host}  -p {ssh_port}    {ssh_pwd}   -------> ',ssh_host)
+    # print(f'     ssh root@{ssh_host}  -p {ssh_port}    {ssh_pwd}   -------> ',ssh_host)
 
 
-    ret = {"host": host,"ssh_port":ssh_port,"ok": False, "stdout": "", "stderr": "", "error": "","wg_server_public_ip":ssh_host}
+    ret = {"row_id":row_id,    "host": host,"ssh_port":ssh_port,"ok": False, "stdout": "", "stderr": "", "error": "","wg_server_public_ip":ssh_host}
 
     ssh = paramiko.SSHClient()
 
@@ -323,7 +329,7 @@ def ssh_exec(data_with_cmd):
 
     except Exception as e:
         ret["error"] = str(e)
-    print(ret['ok'],ret['wg_server_public_ip'],'---------------------------------------------->',ret["error"],ret['stdout'])
+    logger.debug(f"  {ret['wg_server_public_ip']}  {ret['error']}")
 
     return ret
 

@@ -130,17 +130,19 @@ class RowTemplate1(RowTemplate1Template):
             send_to_server_dict = dict(row)
             send_to_server_dict['row_id']=row_id
 
-            fut = anvil.server.call('ssh_exec', dict(row))
+            fut = anvil.server.call('ssh_exec',send_to_server_dict)
             result.append(fut)
             if len(result) !=len(conf_rows):
                 return
             succ     = sum(r['ok'] for r in result)                            # 成功条数
             for r in result:
                 ssh_port = r['ssh_port']
+                row_id = r['row_id']
+                row = app_tables.wg_conf.get_by_id(row_id)
                 if r['ok']:
-                    app_tables.wg_conf.get(wg_server_public_ip=r['wg_server_public_ip'],ssh_port= ssh_port,ip_to=ip_to)['wg_server_ok'] =  ""
+                    row['wg_server_ok'] =  ""
                 else:
-                    app_tables.wg_conf.get(wg_server_public_ip=r['wg_server_public_ip'],ssh_port= ssh_port,ip_to=ip_to)['wg_server_ok'] =   r['error']
+                    row['wg_server_ok'] =   r['error']
                     
             fail_ips = [r['wg_server_public_ip']+"     "+r['error'] for r in result if not r['ok']]# 失败 IP 列表            
             info = "\n".join(fail_ips)
