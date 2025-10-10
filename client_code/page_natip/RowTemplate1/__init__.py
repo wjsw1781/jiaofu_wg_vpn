@@ -326,7 +326,7 @@ class RowTemplate1(RowTemplate1Template):
         
         wg_client_ips_all_client    = [r['wg_client_ip'] for r in app_tables.wg_conf.search(ip_to=ip_to)]
         wg_client_ips    = [r['wg_client_ip'] for r in app_tables.wg_conf.search(ip_to=ip_to,wg_server_ok="")]
-        Notification(f'所有 client wg server 部署成功数量 {len(wg_client_ips)}   总数量{len(wg_client_ips_all_client)}  不成功的不再进行 client 的生成')
+        Notification(f'所有 client wg server 部署成功数量 {len(wg_client_ips)}   总数量{len(wg_client_ips_all_client)}  不成功的不再进行 client 的生成').show()
         # 扩充手机路由规则    获取所有 client ip 进行扩充 一对 5 占用补充 phone 手机 ip 准备 ip范围   
         
         now_phone = [r for r in app_tables.wg_ip_rule.search(for_key_ip_use_to_wg_16=ip_to)]
