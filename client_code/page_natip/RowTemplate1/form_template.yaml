@@ -31,7 +31,11 @@ components:
 - event_bindings: {click: open_this_wg_conf_status_click}
   layout_properties: {column: OUONTH}
   name: open_this_wg_conf_status
-  properties: {text: 查看业务节点现状}
+  properties: {text: 查看配置}
+  type: Button
+- layout_properties: {column: GDHOTS}
+  name: button_1
+  properties: {text: wg_rtt}
   type: Button
 container: {type: DataRowPanel}
 is_package: true
