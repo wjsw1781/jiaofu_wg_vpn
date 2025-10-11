@@ -321,7 +321,7 @@ def ssh_exec(data_with_cmd):
 
             # 避免过度轮询
             end_time=int(time.time())
-            if end_time-now_time>timeout*2:
+            if end_time-now_time>timeout:
                 break
             # 读取实时输出
             if remote_shell.recv_ready():
