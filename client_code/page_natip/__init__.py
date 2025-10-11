@@ -49,7 +49,9 @@ class page_natip(page_natipTemplate):
             used_ip_froms.append(r['ip_use_from'])
             used_ip_froms.append(r['ip_use_to'])
             used_ports.append(r['wg_listen_port'])
-
+            
+        used_ip_froms_num = list(map(lambda ip : ip_to_int(ip,used_ip_froms)))
+        
         available_port = 50000
         available_from = None
         available_to = None
@@ -58,7 +60,10 @@ class page_natip(page_natipTemplate):
         for x in range(255): # Covers 10.0.0.0/24 to 10.254.0.0/24
             potential_ip_from = f"10.{x}.0.0"
             potential_ip_to = f"10.{x+1}.0.0"
-
+            
+            if max(used_ip_froms_num)>ip_to_int(potential_ip_to):
+                continue
+                
             # Check if this IP range is not already in use
             if potential_ip_from not in used_ip_froms and potential_ip_to not in used_ip_froms:
                 available_from = potential_ip_from
