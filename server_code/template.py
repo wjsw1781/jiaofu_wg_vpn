@@ -59,7 +59,27 @@ def get_公私钥(ip):
         return get_公私钥_memory_service(ip)
 
 
+def parse_stub_output(text: str):
+    import re
+    res ={}
+    for m in re.finditer(r'(^|\n)(?P<key>[^\n:]+?)开始.*?\n', text):
+        key = m.group('key').strip()
+        start_pos = m.end()             # 内容起点
+        # 搜 key结束
+        end_pat = re.compile(rf'(^|\n){re.escape(key)}结束', re.M)
+        end_m = end_pat.search(text, start_pos)
+        if end_m:
+            value = text[start_pos:end_m.start()].strip()
+            res[key] = value
+    return res
 
+def make_shell_stub(kv) -> str:
+    out = []
+    for key, cmd in kv.items():
+        out.append(f'echo "{key}开始"')
+        out.append(cmd)
+        out.append(f'echo "{key}结束"')
+    return "\n".join(out)
 
 
 
@@ -150,7 +170,8 @@ def get_wg_server_client_conf(client_ip,server_ip,server_public_ip,ip_from,ip_to
     """
 
     # 服务端直接运行起来   还有一个保活的 py 逻辑 从本地读取即可
-        
+    公网IP_shell=make_shell_stub({"公网IP_shell":'    ip -j -4 addr show dev ppp0     '})
+    所有wg_节点peer_现状_shell=make_shell_stub({"所有wg_节点peer_现状_shell":"""  wg show all dump | grep none  | awk -v now=$(date +%s) '{print $0,now-$6}' | sort -k10n | column -t    """})
     
     cmd_lunch_wg_server = f"""
         # 如果已经安装 wg 则不再安装
@@ -211,8 +232,11 @@ EOF
 pkill -f python3 
 nohup python3 {py_save_to_server_file} > /dev/null 2>&1 &
 
+# 埋点分析统计
+{公网IP_shell}
+{所有wg_节点peer_现状_shell}
 
-echo "当前公网 IP: $( ip -j -4 addr show dev ppp0 )"
+
 
 """
 
@@ -252,8 +276,6 @@ import sys
 @anvil.server.callable
 def ssh_exec(data_with_cmd):
     import paramiko    ,time,os
-    now = time.time()
-
 
 
     row_id = data_with_cmd["row_id"]
@@ -261,7 +283,7 @@ def ssh_exec(data_with_cmd):
     ssh_host = data_with_cmd["ssh_host"]
     ssh_port = data_with_cmd["ssh_port"]
     wg_server_ip = data_with_cmd["wg_server_ip"]
-    logger.success(f'开始执行 ssh_exec  {row_id}')
+    logger.success(f'开始执行 ssh_exec  {row_id}            ssh root@{ssh_host}  -p {ssh_port}    {ssh_pwd}  ')
 
 
 
@@ -274,8 +296,6 @@ def ssh_exec(data_with_cmd):
     user = "root"
     password = ssh_pwd
     timeout = 15
-
-    # print(f'     ssh root@{ssh_host}  -p {ssh_port}    {ssh_pwd}   -------> ',ssh_host)
 
 
     ret = {"row_id":row_id,    "host": host,"ssh_port":ssh_port,"ok": False, "stdout": "", "stderr": "", "error": "","wg_server_public_ip":ssh_host}
@@ -319,9 +339,8 @@ def ssh_exec(data_with_cmd):
             # 避免过度轮询
             time.sleep(0.1)
 
-            # 避免过度轮询
             end_time=int(time.time())
-            if end_time-now_time>timeout:
+            if end_time-now_time>10:
                 break
             # 读取实时输出
             if remote_shell.recv_ready():
@@ -333,32 +352,36 @@ def ssh_exec(data_with_cmd):
                 sys.stdout.write("\033[K")  # 清除当前行
                 sys.stdout.write(output_buffer)
                 sys.stdout.flush()
+    
+        parsed = parse_stub_output(output_buffer)
+        for key in parsed:
+
+            if key == "公网IP_shell":
+                try:
+                    import json
+                    wg_server_public_ip=json.loads(parsed[key])[0]['addr_info']['address']
+                    ret["wg_server_public_ip"] = wg_server_public_ip
+                    logger.debug(f" {row_id}      {key} ---> {wg_server_public_ip}")
+                except Exception as e:
+                    pass
+
+                
+            if key == "所有wg_节点peer_现状_shell":
+                try:
+                    import json
+                    all_wg_peer_info=json.loads(parsed[key])
+                    ret["all_wg_peer_info"] = all_wg_peer_info
+                except Exception as e:
+                    pass
         
-
-        # stdin, stdout, stderr = ssh.exec_command(cmd,timeout=10)
-
-        # while not stdout.channel.exit_status_ready():
-        #     if stdout.channel.recv_ready():
-        #         ret["stdout"] += stdout.channel.recv(1024).decode(errors="ignore")
-        #     if stdout.channel.recv_stderr_ready():
-        #         ret["stderr"] += stdout.channel.recv_stderr(1024).decode(errors="ignore")
-        #     time.sleep(1)
-
-        #     if time.time() - now > 800:
-        #         break
-
-        # ret["stdout"] += stdout.channel.recv(65535).decode(errors="ignore")
-        # ret["stderr"] += stdout.channel.recv_stderr(65535).decode(errors="ignore")
-
         ret["stderr"] = output_buffer
         ret["stdout"] = output_buffer
-        ret["ok"]      = wg_server_ip_sh in ret["stdout"]
+        ret["ok"]      = wg_server_ip_sh in output_buffer
         
 
 
     except Exception as e:
         ret["error"] = str(e)
-    logger.debug(f"  {ret['wg_server_public_ip']}  {ret['error']}")
 
     return ret
 

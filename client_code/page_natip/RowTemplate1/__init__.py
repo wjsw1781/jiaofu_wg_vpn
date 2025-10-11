@@ -178,7 +178,7 @@ class RowTemplate1(RowTemplate1Template):
         total_len_conf = len(total_conf)
         for INDEX , row in enumerate(total_conf):
             row.delete()
-            Notification(f'删除旧配置。。。。。。。{INDEX}/{total_len_conf}').show()
+            # Notification(f'删除旧配置。。。。。。。{INDEX}/{total_len_conf}').show()
 
         
         max_pairs  = 2000
@@ -240,6 +240,8 @@ class RowTemplate1(RowTemplate1Template):
             all_conf_after_threads.append(server_conf)
     
             if len(all_conf_after_threads)!=len(all_conf):
+                # Notification(f'业务创建导致的服务端客户端配置创建并写表----进度---- {len(all_conf_after_threads)}   / {len(all_conf)}').show()
+                time.sleep(1)
                 return
 
             # 最后触发下载
@@ -261,8 +263,8 @@ class RowTemplate1(RowTemplate1Template):
         for index , r in enumerate(all_conf):
             window.setTimeout(lambda row=r: thread_run_one_conf(row), delay)
             delay +=5 
-            Notification(f'业务创建导致的服务端客户端配置创建并写表----进度---- {index}   / {len(all_conf)}').show()
-            time.sleep(1)
+            # Notification(f'业务创建导致的服务端客户端配置创建并写表----进度---- {index}   / {len(all_conf)}').show()
+            # time.sleep(1)
             
 
             
