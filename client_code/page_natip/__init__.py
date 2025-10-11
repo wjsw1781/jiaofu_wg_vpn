@@ -50,7 +50,7 @@ class page_natip(page_natipTemplate):
             used_ip_froms.append(r['ip_use_to'])
             used_ports.append(r['wg_listen_port'])
             
-        used_ip_froms_num = list(map(lambda ip : ip_to_int(ip,used_ip_froms)))
+        used_ip_froms_num = list(map(lambda ip : ip_to_int(ip), used_ip_froms))
         
         available_port = 50000
         available_from = None
