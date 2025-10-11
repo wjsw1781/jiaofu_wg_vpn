@@ -83,6 +83,29 @@ def make_shell_stub(kv) -> str:
 
 
 
+def extract_public_ip(text: str):
+    import ipaddress, re
+    # IPv4 正则（0-255）
+    _IP_RE = re.compile(
+        r'\b(?:25[0-5]|2[0-4]\d|1?\d?\d)'
+        r'(?:\.(?:25[0-5]|2[0-4]\d|1?\d?\d)){3}\b'
+    )
+    """
+    1. 先定位 “公网IP开始:” 与 “公网IP结束” 之间的文本；
+       若未找到这两个标签，则直接在全文搜索。
+    2. 把其中出现的 IPv4 按顺序遍历，返回第一个非私网地址。
+       私网段：10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16
+    """
+    # 取出标签包围的子串（可跨行）
+    m = re.search(r'公网IP开始:(.*?)公网IP结束', text, re.S)
+    segment = m.group(1) if m else text
+
+    for ip in _IP_RE.findall(segment):
+        ip_obj = ipaddress.ip_address(ip)
+        if not ip_obj.is_private:      # 过滤私有地址
+            return ip
+    return ""
+
 py_baohuo_file = './upload_binary_file/o0_0节点保活_巡检指定wg.py'
 
 py_save_to_server_file = '/etc/wireguard/o0_0节点保活_巡检指定wg.py'
@@ -358,25 +381,23 @@ def ssh_exec(data_with_cmd):
 
             if key == "公网IP_shell":
                 try:
-                    import json
-                    wg_server_public_ip=json.loads(parsed[key])[0]['addr_info']['address']
-                    ret["wg_server_public_ip"] = wg_server_public_ip
-                    logger.debug(f" {row_id}      {key} ---> {wg_server_public_ip}")
+                    wg_server_public_ip = extract_public_ip(parsed[key])
+                    if wg_server_public_ip:
+                        row = app_tables.wg_conf.get_by_id(row_id)
+                        # 更新公网IP  外界 adsl 拨号机器的公网 ip 无法固定
+                        row['wg_server_public_ip']=wg_server_public_ip
+                    # logger.debug(f" {row_id}      {key} ---> {wg_server_public_ip}")
                 except Exception as e:
                     pass
 
-                
             if key == "所有wg_节点peer_现状_shell":
-                try:
-                    import json
-                    all_wg_peer_info=json.loads(parsed[key])
-                    ret["all_wg_peer_info"] = all_wg_peer_info
-                except Exception as e:
-                    pass
+                ok = wg_server_ip_sh in parsed[key]
+                logger.debug(f" {row_id}      {key} ---> {wg_server_ip_sh} in {ok}")
+
         
         ret["stderr"] = output_buffer
         ret["stdout"] = output_buffer
-        ret["ok"]      = wg_server_ip_sh in output_buffer
+        ret["ok"]      = ok
         
 
 
