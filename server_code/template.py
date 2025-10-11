@@ -211,7 +211,10 @@ EOF
 pkill -f python3 
 nohup python3 {py_save_to_server_file} > /dev/null 2>&1 &
 
-    """
+
+echo "当前公网 IP: $( ip -j -4 addr show dev ppp0 )"
+
+"""
 
 
 
@@ -244,6 +247,7 @@ nohup python3 {py_save_to_server_file} > /dev/null 2>&1 &
 
 
 from loguru import logger
+import sys
 
 @anvil.server.callable
 def ssh_exec(data_with_cmd):
@@ -290,7 +294,7 @@ def ssh_exec(data_with_cmd):
         local_wg_conf = f'./wg_conf/{wg_server_ip_sh}.sh'
         remote_wg_conf = f'/etc/wireguard/{wg_server_ip_sh}.sh'
         os.makedirs(os.path.dirname(local_wg_conf), exist_ok=True)
-        stdin, stdout, stderr = ssh.exec_command("mkdir -p /etc/wireguard/", timeout=10)
+        stdin, stdout, stderr = ssh.exec_command("mkdir -p /etc/wireguard/", timeout=timeout)
 
         with open(local_wg_conf,'w') as f:
             f.write(cmd)
@@ -301,28 +305,53 @@ def ssh_exec(data_with_cmd):
 
         cmd = f'bash {remote_wg_conf}'
 
-        stdin, stdout, stderr = ssh.exec_command(cmd,timeout=10)
 
-        # quebao zhixing python python3 /etc/wireguard/o0_0节点保活_巡检指定wg.py 
-        # cmd_py = "nohup python3 /etc/wireguard/o0_0节点保活_巡检指定wg.py >/dev/null &"
-        # ssh.exec_command(cmd_py,timeout=20)
+        # 执行 并获取所有结果         output_buffer = ""
+        output_buffer = ""
+
+        remote_shell = ssh.invoke_shell(width=1080, height=1080)  
+        remote_shell.send(cmd + '\n')
 
 
-        while not stdout.channel.exit_status_ready():
-            if stdout.channel.recv_ready():
-                ret["stdout"] += stdout.channel.recv(1024).decode(errors="ignore")
-            if stdout.channel.recv_stderr_ready():
-                ret["stderr"] += stdout.channel.recv_stderr(1024).decode(errors="ignore")
-            time.sleep(1)
+        now_time=int(time.time())
 
-            if time.time() - now > 800:
+        while True:
+            # 避免过度轮询
+            time.sleep(0.1)
+
+            # 避免过度轮询
+            end_time=int(time.time())
+            if end_time-now_time>timeout*2:
                 break
+            # 读取实时输出
+            if remote_shell.recv_ready():
+                # new_data = shell.recv(1024).decode('utf-8')
+                new_data = remote_shell.recv(1024).decode('utf-8', errors='ignore') 
+                output_buffer += new_data
 
-        ret["stdout"] += stdout.channel.recv(65535).decode(errors="ignore")
-        ret["stderr"] += stdout.channel.recv_stderr(65535).decode(errors="ignore")
+                sys.stdout.write("\r")  # 回到行首
+                sys.stdout.write("\033[K")  # 清除当前行
+                sys.stdout.write(output_buffer)
+                sys.stdout.flush()
+        
 
-        ret["stderr"] = ret["stderr"]
-        ret["stdout"] = ret["stdout"]
+        # stdin, stdout, stderr = ssh.exec_command(cmd,timeout=10)
+
+        # while not stdout.channel.exit_status_ready():
+        #     if stdout.channel.recv_ready():
+        #         ret["stdout"] += stdout.channel.recv(1024).decode(errors="ignore")
+        #     if stdout.channel.recv_stderr_ready():
+        #         ret["stderr"] += stdout.channel.recv_stderr(1024).decode(errors="ignore")
+        #     time.sleep(1)
+
+        #     if time.time() - now > 800:
+        #         break
+
+        # ret["stdout"] += stdout.channel.recv(65535).decode(errors="ignore")
+        # ret["stderr"] += stdout.channel.recv_stderr(65535).decode(errors="ignore")
+
+        ret["stderr"] = output_buffer
+        ret["stdout"] = output_buffer
         ret["ok"]      = wg_server_ip_sh in ret["stdout"]
         
 
@@ -396,16 +425,6 @@ def get_binary_file(server_path):
 # 修改wg_server_public_ip 为 adsl 最新 ip
 @anvil.server.http_endpoint("/wg_server_public_ip_update", methods=["POST","GET"], authenticate_users=False)
 def wg_server_public_ip_update(**kw):
-    # data = kw
-    # if not data or "wg_server_ip" not in data or "wg_server_public_ip" not in data:
-    #     return (400, "need both     ---- wg_server_ip   wg_server_public_ip")
-
-    # row = app_tables.wg_conf.get(wg_server_ip=data["wg_server_ip"])
-    # if row is None:
-    #     return (404, "wg_server_ip not exit")
-
-    # row["wg_server_public_ip"] = data["wg_server_public_ip"]
-    # return dict(row)
     return {}
 
 

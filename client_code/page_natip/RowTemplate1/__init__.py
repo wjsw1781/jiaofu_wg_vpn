@@ -442,28 +442,25 @@ class RowTemplate1(RowTemplate1Template):
         """
 
         
-        all_ip_rule = list(app_tables.wg_ip_rule.search(for_key_ip_use_to_wg_16=ip_to,ip_to_wg_client= q.not_(None)))
-        all_rule = []
-        for rule_row in all_ip_rule:
-            ip_addr = rule_row['ip_from_phone']
-            use_wg_if_client = rule_row['ip_to_wg_client'].replace('.','_')
-            template = f"""
-                        ip rule list   | grep {ip_addr} | awk '{{print $1}}' | tr -d ':' |xargs -r -I{{}} ip rule del pref {{}}
-                        ip rule add from {ip_addr} lookup {use_wg_if_client}
 
-            """
-            all_rule.append(template)
 
         # wg 客户端 sh conf 生成 只要 wg_server_ok=""   拼接命令的同时 吧 sh 也进行保存到/etc/wiregard/*.sh
+        wg_服务端已经成功配置才进行客户端配置的生成 = app_tables.wg_conf.search(ip_to=ip_to,wg_server_ok="")
+        if len(wg_服务端已经成功配置才进行客户端配置的生成) == 0:
+            alert(f'没有找到 wg_server_ok=""  的记录，说明所有的 wg 服务端都没部署成功 不进行客户端配置的生成')
+            return
+        
         wg_client_lunchs = []
-        for wg_conf_server_client in app_tables.wg_conf.search(ip_to=ip_to,wg_server_ok=""):
+        for wg_conf_server_client in wg_服务端已经成功配置才进行客户端配置的生成:
             lunch_name =  wg_conf_server_client['wg_client_ip'].replace('.','_')
             sh_file = f'/etc/wireguard/{lunch_name}.sh'
             one_wg_client_conf = wg_conf_server_client['wg_client_conf']
             wg_server_public_ip = wg_conf_server_client['wg_server_public_ip'].strip()
+
             if wg_server_public_ip.count('.')!=3:
                 Notification(f'adsl 正确的ip 还没上报上来 不进行 配置的生成 --------  {wg_server_public_ip}').show()
                 continue
+            
             import re
             one_wg_client_conf = re.sub(
                 r"(Endpoint\s*=\s*)[^:]+",                 # 匹配 Endpoint 后到冒号前
@@ -485,12 +482,25 @@ bash {sh_file}
 
             """
             wg_client_lunchs.append(save_to_sh_and_shell_raw)
-            
-        # 拉起 wg 客户端
+
         wg_client_lunchs    = "\n\n".join(wg_client_lunchs)
 
         # 路由表配置命令
+        all_ip_rule = list(app_tables.wg_ip_rule.search(for_key_ip_use_to_wg_16=ip_to,ip_to_wg_client= q.not_(None)))
+        all_rule = []
+        for rule_row in all_ip_rule:
+            ip_addr = rule_row['ip_from_phone']
+            use_wg_if_client = rule_row['ip_to_wg_client'].replace('.','_')
+            template = f"""
+                        ip rule list   | grep {ip_addr} | awk '{{print $1}}' | tr -d ':' |xargs -r -I{{}} ip rule del pref {{}}
+                        ip rule add from {ip_addr} lookup {use_wg_if_client}
+
+            """
+            all_rule.append(template)
         all_rule = "\n\n".join(all_rule)
+
+
+
 
         # 所有命令
         txt  = first_cmd + wg_client_lunchs + all_rule
