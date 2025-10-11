@@ -336,7 +336,6 @@ class RowTemplate1(RowTemplate1Template):
         
         wg_client_ips_all_client    = [r['wg_client_ip'] for r in app_tables.wg_conf.search(ip_to=ip_to)]
         wg_client_ips    = [r['wg_client_ip'] for r in app_tables.wg_conf.search(ip_to=ip_to,wg_server_ok="")]
-        alert(f'所有 client wg server 部署成功数量 {len(wg_client_ips)}   总数量{len(wg_client_ips_all_client)}  不成功的不再进行 client 的生成')
         # 扩充手机路由规则    获取所有 client ip 进行扩充 一对 5 占用补充 phone 手机 ip 准备 ip范围   
         
         now_phone = [r for r in app_tables.wg_ip_rule.search(for_key_ip_use_to_wg_16=ip_to)]
@@ -361,7 +360,10 @@ class RowTemplate1(RowTemplate1Template):
                     for_key_ip_use_to_wg_16  = ip_to,
                     info=info_template,
                 )
-            Notification(f"进度------> 构造客户端wg_ip 负载 ip rule  {index}/{len(wg_client_ips)}").show()
+            Notification(f"进度------> 构造路由表  ip rule 客户端wg_ip 负载 ip rule  {index}/{len(wg_client_ips)}").show()
+
+
+
         dhcp_start = int_to_ip(ip_to_int(gateway_ip)+1)
         dhcp_end   = mobile_ip
         
@@ -370,12 +372,7 @@ class RowTemplate1(RowTemplate1Template):
         # dns 操作 
         DNSMASQ_CONF = "/etc/dnsmasq.conf"
         wifi_网卡 = minipc_wifi_iplink_name or  'enp3s0' 
-        系统自带dns_file = "/etc/resolv.conf"
 
-        系统自带dns_conf = """
-            nameserver 127.0.0.1
-        """
-    
 
         ali_dns = '223.5.5.5' 
         google_dns = '8.8.8.8'
@@ -383,7 +380,7 @@ class RowTemplate1(RowTemplate1Template):
         china_dns = '114.114.114.114'
         ad = '94.140.14.14'
         use_dns = cf_dns
-        lease_time = "12h"
+        lease_time = "1h"
         netmask = "255.255.0.0"            
         
         dnsmasq_conf = f"""
@@ -393,9 +390,10 @@ class RowTemplate1(RowTemplate1Template):
             log-facility=/var/log/dnsmasq.log
             port=53
             server={use_dns}
-            # listen-address=127.0.0.1
             
-            
+            # 只要不是这个 ip 池的ip 尽快触发新的 nak 报文   释放 ip  分配新的 ip
+            dhcp-authoritative         
+
             # 第一个网卡管理 ===================== ===================== ===================== ===================== =====================
             listen-address={gateway_ip}
             interface={wifi_网卡}
@@ -452,6 +450,17 @@ class RowTemplate1(RowTemplate1Template):
             alert(f'没有找到 wg_server_ok=""  的记录，说明所有的 wg 服务端都没部署成功 不进行客户端配置的生成')
             return
         
+        # 所有部署成功 wgserver 所以只能这些 client 能够运行 所以这些 client 才能服务 ip
+        alert(f"""
+              
+              总数量{len(wg_client_ips_all_client)}  
+              所有 client wg server 部署成功数量 {len(wg_client_ips)}   不成功的不再进行 client 的运行 
+
+              本次变动只会服务 ip 量为{len(wg_client_ips_awg_client_ipsll_client)*phone_per_cli}   可能导致的后果是上次 ipdns 已经分配的 ip 不可用 需要 dns 那边重新配置 租约释放掉
+
+              即将构造具体的 client conf sh 配置
+
+        """)
         wg_client_lunchs = []
         for wg_conf_server_client in wg_服务端已经成功配置才进行客户端配置的生成:
             lunch_name =  wg_conf_server_client['wg_client_ip'].replace('.','_')
