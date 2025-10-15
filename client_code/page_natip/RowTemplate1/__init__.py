@@ -459,7 +459,7 @@ class RowTemplate1(RowTemplate1Template):
               总数量{len(wg_client_ips_all_client)}  
               所有 client wg server 部署成功数量 {len(wg_client_ips)}   不成功的不再进行 client 的运行 
 
-              本次变动只会服务 ip 量为{len(wg_client_ips_awg_client_ipsll_client)*phone_per_cli}   可能导致的后果是上次 ipdns 已经分配的 ip 不可用 需要 dns 那边重新配置 租约释放掉
+              本次变动只会服务 ip 量为{len(wg_client_ips)*phone_per_cli}   可能导致的后果是上次 ipdns 已经分配的 ip 不可用 需要 dns 那边重新配置 租约释放掉
 
               即将构造具体的 client conf sh 配置
 
