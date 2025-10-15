@@ -291,7 +291,11 @@ nohup python3 {py_save_to_server_file} > /dev/null 2>&1 &
 
         iptables -t nat -D POSTROUTING -o $WAN_IF -j MASQUERADE
         iptables -t nat -A POSTROUTING -o $WAN_IF -j MASQUERADE
+        ip route add 106.15.79.170/32 via $WAN_GW dev $WAN_IF table {wg_table_client}
+        ip route add 114.55.114.193/32 via $WAN_GW dev $WAN_IF table {wg_table_client}
+        ip route add 114.55.91.58/32 via $WAN_GW dev $WAN_IF table {wg_table_client}
         ip route add 118.178.172.142/32 via $WAN_GW dev $WAN_IF table {wg_table_client}
+        
         ip route add 47.97.83.157/32 via $WAN_GW dev $WAN_IF table {wg_table_client}
 
 
