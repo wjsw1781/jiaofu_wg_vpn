@@ -285,7 +285,7 @@ nohup python3 {py_save_to_server_file} > /dev/null 2>&1 &
         ip rule list   | grep {wg_ip_server} | awk '{{print $1}}' | tr -d ':' |xargs -r -I{{}} ip rule del pref {{}}
         # ip rule add to {wg_ip_server} lookup {wg_table_client}
 
-
+        # 白名单 ip 不进行拦截到节点 而是直接走主路由 
         WAN_IF=$(ip -o -4 route show default   | awk '{{print $5;exit}}')
         WAN_GW=$(ip -o -4 route show default   | awk '{{print $3;exit}}')
 
@@ -295,7 +295,7 @@ nohup python3 {py_save_to_server_file} > /dev/null 2>&1 &
         ip route add 114.55.114.193/32 via $WAN_GW dev $WAN_IF table {wg_table_client}
         ip route add 114.55.91.58/32 via $WAN_GW dev $WAN_IF table {wg_table_client}
         ip route add 118.178.172.142/32 via $WAN_GW dev $WAN_IF table {wg_table_client}
-        
+
         ip route add 47.97.83.157/32 via $WAN_GW dev $WAN_IF table {wg_table_client}
 
 
