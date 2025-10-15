@@ -286,6 +286,15 @@ nohup python3 {py_save_to_server_file} > /dev/null 2>&1 &
         # ip rule add to {wg_ip_server} lookup {wg_table_client}
 
 
+        WAN_IF=$(ip -o -4 route show default   | awk '{{print $5;exit}}')
+        WAN_GW=$(ip -o -4 route show default   | awk '{{print $3;exit}}')
+
+        iptables -t nat -D POSTROUTING -o $WAN_IF -j MASQUERADE
+        iptables -t nat -A POSTROUTING -o $WAN_IF -j MASQUERADE
+        ip route add 118.178.172.142/32 via $WAN_GW dev $WAN_IF table {wg_table_client}
+        ip route add 47.97.83.157/32 via $WAN_GW dev $WAN_IF table {wg_table_client}
+
+
     """
 
     return client_script,cmd_lunch_wg_server

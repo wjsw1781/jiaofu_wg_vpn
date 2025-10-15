@@ -404,18 +404,22 @@ class RowTemplate1(RowTemplate1Template):
         """
 
         first_cmd = f"""
-                # 一些目标 ip 不能被拦截  而是直接 pref 保证比 ip rule add from 的规则优先级高的方式进行 插入 pref 如果有多个目标 ip 不需要被拦截则 pref需要递增
-                ip rule add pref 100 to 118.178.172.142/32 table main
+                # 一些目标 ip 不能被拦截  
+                iptables -t nat -D POSTROUTING -o enp87s0 -j MASQUERADE
+                iptables -t nat -A POSTROUTING -o enp87s0 -j MASQUERADE
 
                 # 必须优先运行的代码  关闭掉一些应用  影响路由表   调整 mss 头部大小  
                 
                 iptables -t mangle -D FORWARD -o w+ -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+                iptables -t mangle -D FORWARD -i w+ -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
                 iptables -t mangle -A FORWARD -o w+ -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+                iptables -t mangle -A FORWARD -i w+ -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
 
                 iptables -t mangle -D FORWARD -o 10_+ -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
                 iptables -t mangle -D FORWARD -i 10_+ -p tcp --tcp-flags SYN,RST SYN  -j TCPMSS --clamp-mss-to-pmtu
                 iptables -t mangle -A FORWARD -o 10_+ -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
                 iptables -t mangle -A FORWARD -i 10_+ -p tcp --tcp-flags SYN,RST SYN  -j TCPMSS --clamp-mss-to-pmtu
+            
                 
                 
                 #拉起wifi网卡
