@@ -1,0 +1,13 @@
+components:
+- layout_properties: {slot: default}
+  name: content_panel
+  properties: {}
+  type: ColumnPanel
+- layout_properties: {slot: sidebar}
+  name: nav_1
+  properties: {}
+  type: form:nav
+container:
+  properties: {html: '@theme:dashboard.html'}
+  type: HtmlTemplate
+is_package: true
