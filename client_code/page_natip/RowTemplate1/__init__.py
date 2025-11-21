@@ -140,7 +140,7 @@ class RowTemplate1(RowTemplate1Template):
                 row_id = r['row_id']
                 row = app_tables.wg_conf.get_by_id(row_id)
                 if r['ok']:
-                    row['wg_server_ok'] =  ""
+                    row['wg_server_ok'] =  "ok"
                 else:
                     row['wg_server_ok'] =   r['error']
                     
@@ -333,11 +333,20 @@ class RowTemplate1(RowTemplate1Template):
         ip_to  = self.item['ip_use_to']
         minipc_wifi_iplink_name = self.item['minipc_wifi_iplink_name']
         per_in_of_out = self.item['per_in_of_out']
-        
+
+
         wg_client_ips_all_client    = [r['wg_client_ip'] for r in app_tables.wg_conf.search(ip_to=ip_to)]
-        wg_client_ips    = [r['wg_client_ip'] for r in app_tables.wg_conf.search(ip_to=ip_to,wg_server_ok="")]
-        # 扩充手机路由规则    获取所有 client ip 进行扩充 一对 5 占用补充 phone 手机 ip 准备 ip范围   
+
+        # 所有client 的 wg server 已经部署成功的 client 本地才能进行拉起 和负载
+        wg_服务端已经成功配置才进行客户端配置的生成 = app_tables.wg_conf.search(ip_to=ip_to,wg_server_ok="ok")
+
+        if len(wg_服务端已经成功配置才进行客户端配置的生成) == 0:
+            alert(f'没有找到 wg_server_ok=""  的记录，说明所有的 wg 服务端都没部署成功 不进行客户端配置的生成')
+            return
         
+        wg_client_ips    = [r['wg_client_ip'] for r in wg_服务端已经成功配置才进行客户端配置的生成]
+
+        # 扩充手机路由规则    获取所有 client ip 进行扩充 一对 5 占用补充 phone 手机 ip 准备 ip范围   
         now_phone = [r for r in app_tables.wg_ip_rule.search(for_key_ip_use_to_wg_16=ip_to)]
         phone_per_cli  = int(per_in_of_out)                          # 1 : 5
         cursor         = ip_to_int(now_phone[0]['ip_from_phone'])
@@ -346,30 +355,41 @@ class RowTemplate1(RowTemplate1Template):
         gateway_ip  = int_to_ip(cursor)
         
         info_template = now_phone[0]['info']
-        for index,cli_ip in enumerate(wg_client_ips):          # 遍历 WG-client IP
-            for _ in range(phone_per_cli):    # 给每个 client 派 5 个手机 IP
+
+        for old in app_tables.wg_ip_rule.search(for_key_ip_use_to_wg_16=ip_to,ip_to_wg_client=cli_ip):
+            old.delete()
+
+        for index,cli_ip in enumerate(wg_client_ips):
+            for _ in range(phone_per_cli):    
                 cursor += 1
                 mobile_ip = int_to_ip(cursor)
-        
-                if len(app_tables.wg_ip_rule.search(ip_from_phone=mobile_ip,ip_to_wg_client=cli_ip)):
-                    continue                                   # 已存在 → 跳过
-        
+
                 app_tables.wg_ip_rule.add_row(                # 不存在 → 新增
                     ip_from_phone            = mobile_ip,
                     ip_to_wg_client          = cli_ip,        
                     for_key_ip_use_to_wg_16  = ip_to,
                     info=info_template,
                 )
+
             Notification(f"进度------> 构造路由表  ip rule 客户端wg_ip 负载 ip rule  {index}/{len(wg_client_ips)}").show()
 
+        alert(f"""
+              
+              总数量{len(wg_client_ips_all_client)}  
+              所有 client wg server 部署成功数量 {len(wg_client_ips)}   不成功的不再进行 client 的运行 
+
+              本次变动只会服务 ip 量为{len(wg_client_ips)*phone_per_cli}   可能导致的后果是上次 ipdns 已经分配的 ip 不可用 需要 dns 那边重新配置 租约释放掉
+
+              即将构造具体的 client conf sh 配置
+
+        """)
 
 
+
+        # ip 关系确认了 就能配置 路由器的池子 ip了  开始分配 ip 结束ip
         dhcp_start = int_to_ip(ip_to_int(gateway_ip)+1)
         dhcp_end   = mobile_ip
         
-        
-
-        # dns 操作 
         DNSMASQ_CONF = "/etc/dnsmasq.conf"
         wifi_网卡 = minipc_wifi_iplink_name or  'enp3s0' 
 
@@ -403,10 +423,15 @@ class RowTemplate1(RowTemplate1Template):
     
         """
 
+        # 开始构造命令
         first_cmd = f"""
 
-                # 必须优先运行的代码  关闭掉一些应用  影响路由表   调整 mss 头部大小  
-                
+                # 必须优先运行的代码  关闭掉一些应用  影响路由表   调整 mss 头部大小 
+                # 关掉 wg 除了 10_9 的底层组网以外 清除ip rule 表
+                ip rule list | grep -v 10_9 | grep -v all | grep -v def | grep -v local | awk '{{print $1}}' | tr -d ':' | xargs -I {{}} ip rule del pref {{}}
+                wg show all dump | awk '{{print $1}}' | uniq | grep -v 10_9 | xargs -n1 wg-quick down 
+
+
                 iptables -t mangle -D FORWARD -o w+ -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
                 iptables -t mangle -D FORWARD -i w+ -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
                 iptables -t mangle -A FORWARD -o w+ -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
@@ -447,23 +472,6 @@ class RowTemplate1(RowTemplate1Template):
         
 
 
-        # wg 客户端 sh conf 生成 只要 wg_server_ok=""   拼接命令的同时 吧 sh 也进行保存到/etc/wiregard/*.sh
-        wg_服务端已经成功配置才进行客户端配置的生成 = app_tables.wg_conf.search(ip_to=ip_to,wg_server_ok="")
-        if len(wg_服务端已经成功配置才进行客户端配置的生成) == 0:
-            alert(f'没有找到 wg_server_ok=""  的记录，说明所有的 wg 服务端都没部署成功 不进行客户端配置的生成')
-            return
-        
-        # 所有部署成功 wgserver 所以只能这些 client 能够运行 所以这些 client 才能服务 ip
-        alert(f"""
-              
-              总数量{len(wg_client_ips_all_client)}  
-              所有 client wg server 部署成功数量 {len(wg_client_ips)}   不成功的不再进行 client 的运行 
-
-              本次变动只会服务 ip 量为{len(wg_client_ips)*phone_per_cli}   可能导致的后果是上次 ipdns 已经分配的 ip 不可用 需要 dns 那边重新配置 租约释放掉
-
-              即将构造具体的 client conf sh 配置
-
-        """)
         wg_client_lunchs = []
         for wg_conf_server_client in wg_服务端已经成功配置才进行客户端配置的生成:
             lunch_name =  wg_conf_server_client['wg_client_ip'].replace('.','_')
@@ -494,7 +502,11 @@ EOF
 bash {sh_file}
 
 
+
+
             """
+
+            
             wg_client_lunchs.append(save_to_sh_and_shell_raw)
 
         wg_client_lunchs    = "\n\n".join(wg_client_lunchs)

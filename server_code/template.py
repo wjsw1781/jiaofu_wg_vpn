@@ -110,12 +110,6 @@ py_baohuo_file = './upload_binary_file/o0_0节点保活_巡检指定wg.py'
 
 py_save_to_server_file = '/etc/wireguard/o0_0节点保活_巡检指定wg.py'
 
-try:
-    with open(py_baohuo_file,'r') as ff:
-        py_baohuo_file_content = ff.read()
-except :
-    py_baohuo_file_content = "print('本地没有读取到这个文件')"
-
 
 
 
@@ -124,6 +118,13 @@ except :
 def get_wg_server_client_conf(client_ip,server_ip,server_public_ip,ip_from,ip_to,wg_listen_port,RT_table_ID,wg_server_public_ip):
     prefixlen = 30
     MTU = 1330
+    try:
+        with open(py_baohuo_file,'r') as ff:
+            py_baohuo_file_content = ff.read()
+    except :
+        py_baohuo_file_content = "print('本地没有读取到这个文件')"
+
+
 
     wg_table_client = f"{client_ip.replace('.', '_')}"
     wg_table_server = f"{server_ip.replace('.', '_')}"
@@ -199,7 +200,7 @@ def get_wg_server_client_conf(client_ip,server_ip,server_public_ip,ip_from,ip_to
     cmd_lunch_wg_server = f"""
         # 如果已经安装 wg 则不再安装
         if ! which wg-quick; then
-          apt-get update &&   sudo apt-get install -y --no-install-recommends  wireguard-dkms wireguard-tools
+          apt-get update &&   sudo apt-get install -y --no-install-recommends   wireguard-tools
         fi
 
         PORT_IN_USE=$(wg show all dump | awk '{{print $4}}' | grep -w "{ListenPort}")
@@ -297,6 +298,8 @@ nohup python3 {py_save_to_server_file} > /dev/null 2>&1 &
         ip route add 118.178.172.142/32 via $WAN_GW dev $WAN_IF table {wg_table_client}
 
         ip route add 47.97.83.157/32 via $WAN_GW dev $WAN_IF table {wg_table_client}
+        ip route add 121.43.142.174/32 via $WAN_GW dev $WAN_IF table {wg_table_client}
+        ip route add 121.41.230.122/32 via $WAN_GW dev $WAN_IF table {wg_table_client}
 
 
     """
