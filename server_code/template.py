@@ -197,29 +197,17 @@ def get_wg_server_client_conf(client_ip,server_ip,server_public_ip,ip_from,ip_to
     公网IP_shell=make_shell_stub({"公网IP_shell":'    ip -j -4 addr show dev ppp0     '})
     所有wg_节点peer_现状_shell=make_shell_stub({"所有wg_节点peer_现状_shell":"""  wg show all dump | grep none  | awk -v now=$(date +%s) '{print $0,now-$6}' | sort -k10n | column -t    """})
     
+    # 服务端脚本
     cmd_lunch_wg_server = f"""
         # 如果已经安装 wg 则不再安装
         if ! which wg-quick; then
           apt-get update &&   sudo apt-get install -y --no-install-recommends   wireguard-tools
         fi
 
-        PORT_IN_USE=$(wg show all dump | awk '{{print $4}}' | grep -w "{ListenPort}")
 
-        if [ -n "$PORT_IN_USE" ]; then
-            echo "WARN: WireGuard ListenPort {ListenPort} 已被其他 WG 接口占用。正在关闭 指定WG 接口而不是所有接口以避免冲突..."
-            # 关闭所有 wg 进程 防止端口冲突 起不来wg 进程 清理路由表 路由规则 保持干净环境
-            # 这里使用 wg show interfaces 获取所有接口名，然后逐个执行 wg-quick down  应该是找到指定的旧接口名
-            wg show all dump | grep -v none | grep "{ListenPort}" | awk '{{print $1}}' | xargs -n1 wg-quick down
-            
-            echo "所有 WireGuard 接口已关闭。"
-            # wg show interfaces | xargs -n 1 |xargs -n1 wg-quick down
-            # sed -i '/10.*$/d' /etc/iproute2/rt_tables
-            # sed -i '/^$/d' /etc/iproute2/rt_tables
-            # ip rule list | grep -v -E "lookup (local|main|default)" | awk '{{print $1}}' | tr -d ':' | xargs -I {{}} ip rule del pref {{}}
-
-        else
-            echo "WireGuard ListenPort {ListenPort} 未被占用，可以正常启动。"
-        fi
+        # 关闭所有的 wg
+        wg show all dump | awk '{{print $1}}' | uniq | grep -v 10_9 | xargs -n1 wg-quick down 
+        ip rule list | grep -v -E "lookup (local|main|default)" | awk '{{print $1}}' | tr -d ':' | xargs -I {{}} ip rule del pref {{}}
 
 
         echo "{server_conf}" > {wg_conf_file_server}
@@ -247,20 +235,7 @@ def get_wg_server_client_conf(client_ip,server_ip,server_public_ip,ip_from,ip_to
         ip rule add to {from_ip}/16 lookup {wg_table_server}
 
 
-
-# 保活 py 逻辑 上报逻辑更新adsl最新公网 ip 的逻辑
-cat << 'EOF' > {py_save_to_server_file}
-{py_baohuo_file_content}
-EOF
-
-pkill -f python3 
-nohup python3 {py_save_to_server_file} > /dev/null 2>&1 &
-
-# 埋点分析统计
-{公网IP_shell}
-{所有wg_节点peer_现状_shell}
-
-
+        {所有wg_节点peer_现状_shell}
 
 """
 
@@ -347,9 +322,6 @@ def ssh_exec(data_with_cmd):
 
         wg_server_ip_sh = wg_server_ip.replace(".","_")
         
-
-
-    
         local_wg_conf = f'./wg_conf/{wg_server_ip_sh}.sh'
         remote_wg_conf = f'/etc/wireguard/{wg_server_ip_sh}.sh'
         os.makedirs(os.path.dirname(local_wg_conf), exist_ok=True)
@@ -393,18 +365,8 @@ def ssh_exec(data_with_cmd):
                 sys.stdout.flush()
     
         parsed = parse_stub_output(output_buffer)
+        ok = ""
         for key in parsed:
-
-            if key == "公网IP_shell":
-                try:
-                    wg_server_public_ip = extract_public_ip(parsed[key])
-                    if wg_server_public_ip:
-                        row = app_tables.wg_conf.get_by_id(row_id)
-                        # 更新公网IP  外界 adsl 拨号机器的公网 ip 无法固定
-                        row['wg_server_public_ip']=wg_server_public_ip
-                    # logger.debug(f" {row_id}      {key} ---> {wg_server_public_ip}")
-                except Exception as e:
-                    pass
 
             if key == "所有wg_节点peer_现状_shell":
                 ok = wg_server_ip_sh in parsed[key]

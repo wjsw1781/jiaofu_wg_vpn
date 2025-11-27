@@ -176,14 +176,13 @@ class RowTemplate1(RowTemplate1Template):
 
         total_conf =  app_tables.wg_conf.search(ip_to = ip_to)
         total_len_conf = len(total_conf)
+
         for INDEX , row in enumerate(total_conf):
             row.delete()
-            # Notification(f'删除旧配置。。。。。。。{INDEX}/{total_len_conf}').show()
+            Notification(f'删除旧配置。。。。。。。{INDEX}/{total_len_conf}').show()
 
         
         max_pairs  = 2000
-    
-
 
         start = ip_to_int(ip_to)
         end   = start+max_pairs
@@ -216,6 +215,7 @@ class RowTemplate1(RowTemplate1Template):
             current += 4
             count   += 1
     
+
         def thread_run_one_conf(one_conf):
             
             client_ip,server_ip,server_public_ip,ip_from,ip_to,wg_listen_port,RT_table_ID,ssh_host,ssh_port,ssh_pwd,wg_server_public_ip = one_conf
@@ -240,7 +240,7 @@ class RowTemplate1(RowTemplate1Template):
             all_conf_after_threads.append(server_conf)
     
             if len(all_conf_after_threads)!=len(all_conf):
-                # Notification(f'业务创建导致的服务端客户端配置创建并写表----进度---- {len(all_conf_after_threads)}   / {len(all_conf)}').show()
+                Notification(f'业务创建导致的服务端客户端配置创建并写表----进度---- {len(all_conf_after_threads)}   / {len(all_conf)}').show()
                 time.sleep(1)
                 return
 
@@ -356,7 +356,7 @@ class RowTemplate1(RowTemplate1Template):
         
         info_template = now_phone[0]['info']
 
-        for old in app_tables.wg_ip_rule.search(for_key_ip_use_to_wg_16=ip_to,ip_to_wg_client=cli_ip):
+        for old in app_tables.wg_ip_rule.search(for_key_ip_use_to_wg_16=ip_to):
             old.delete()
 
         for index,cli_ip in enumerate(wg_client_ips):
@@ -506,7 +506,7 @@ bash {sh_file}
 
             """
 
-            
+
             wg_client_lunchs.append(save_to_sh_and_shell_raw)
 
         wg_client_lunchs    = "\n\n".join(wg_client_lunchs)
