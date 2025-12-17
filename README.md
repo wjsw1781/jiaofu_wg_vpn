@@ -93,13 +93,76 @@ If you want to get to the basics as quickly as possible, each section of this do
 cd /root/socks_ss_gfw_ss_socks/linux_透明代理_多路组网_子网划分/wg_批量部署/jiaofu_wg_vpn
 
 
-cd /root/socks_ss_gfw_ss_socks/linux_透明代理_多路组网_子网划分/wg_批量部署/jiaofu_wg_vpn && /usr/local/python3.9/bin/anvil-app-server --app . --port 58000 --ip 0.0.0.0 --auto-migrate 
+pkill -f anvil-app-server
+
+cd /root/socks_ss_gfw_ss_socks/linux_透明代理_多路组网_子网划分/wg_批量部署/jiaofu_wg_vpn && /usr/local/python3.9/bin/anvil-app-server --app . --port 58002 --ip 0.0.0.0  --auto-migrate 
 
 
-cd /root/socks_ss_gfw_ss_socks/linux_透明代理_多路组网_子网划分/wg_批量部署/jiaofu_wg_vpn &&  nohup /usr/local/python3.9/bin/anvil-app-server --app . --port 58000 --ip 0.0.0.0 --auto-migrate  >/dev/null 2>&1 &
+cd /root/socks_ss_gfw_ss_socks/linux_透明代理_多路组网_子网划分/wg_批量部署/jiaofu_wg_vpn && /usr/local/python3.9/bin/anvil-app-server --app . --port 58000 --ip 0.0.0.0 --origin http://47.97.83.157:58001  --auto-migrate 
+
+
+cd /root/socks_ss_gfw_ss_socks/linux_透明代理_多路组网_子网划分/wg_批量部署/jiaofu_wg_vpn &&  nohup /usr/local/python3.9/bin/anvil-app-server --app . --port 58000 --ip 127.0.0.1 --origin http://47.97.83.157:58001  --auto-migrate  >/dev/null 2>&1 &
 
 
 pkill -f anvil-app-server
+
+
+
+<!-- 添加密码认证 -->
+# 1) 生成 .htpasswd
+
+printf "admin:$(openssl passwd -crypt 1213wzwz)\n" > /tmp/.htpasswd
+
+# 2) 写入 Nginx 配置
+
+cat > /root/socks_ss_gfw_ss_socks/linux_透明代理_多路组网_子网划分/wg_批量部署/jiaofu_wg_vpn/nginx_conf.conf <<'EOF'
+events{}
+http {
+    server {
+        listen 58001;
+
+
+        # 静态资源免认证
+        location ^~ /_/ {
+            proxy_pass http://127.0.0.1:58000;
+            proxy_set_header Host $host:$server_port;
+        }
+        
+        # WebSocket 免认证
+        location /_/ws {
+            proxy_pass http://127.0.0.1:58000;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host:$server_port;
+        }
+        
+        location / {
+            # 认证
+            auth_basic "Admin Access";
+            auth_basic_user_file /tmp/.htpasswd;
+            
+            # 转发
+            proxy_pass http://127.0.0.1:58000;
+            
+            # 确保传递正确的 Host（有时需要）
+            proxy_set_header Host $host:$server_port;
+        }
+    }
+}
+EOF
+
+/usr/local/openresty/nginx/sbin/nginx -c /root/socks_ss_gfw_ss_socks/linux_透明代理_多路组网_子网划分/wg_批量部署/jiaofu_wg_vpn/nginx_conf.conf -s reload
+           
+           
+
+<!-- 直接运行 -->
+
+/usr/local/openresty/nginx/sbin/nginx -c /root/socks_ss_gfw_ss_socks/linux_透明代理_多路组网_子网划分/wg_批量部署/jiaofu_wg_vpn/nginx_conf.conf
+
+
+/usr/local/openresty/nginx/sbin/nginx -c /root/socks_ss_gfw_ss_socks/linux_透明代理_多路组网_子网划分/wg_批量部署/jiaofu_wg_vpn/nginx_conf.conf -s stop
+
 
 
 47.97.83.157:58000
@@ -108,12 +171,6 @@ pkill -f anvil-app-server
 watch -n1 "echo '--- enp87s0 ---'; ip -s link show enp87s0; \
            echo '--- enp2s0f0 ---'; ip -s link show enp2s0f0; \
            echo '--- 10_1_0_77 ---'; ip -s link show 10_1_0_77"
-
-
-           
-
-
-           
 
 
            

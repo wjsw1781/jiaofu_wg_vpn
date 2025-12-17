@@ -134,7 +134,7 @@ class RowTemplate1(RowTemplate1Template):
             result.append(fut)
             if len(result) !=len(conf_rows):
                 return
-            succ     = sum(r['ok'] for r in result)                            # 成功条数
+            succ     = sum(int(r['ok'] or 1) for r in result)                            # 成功条数
             for r in result:
                 ssh_port = r['ssh_port']
                 row_id = r['row_id']
