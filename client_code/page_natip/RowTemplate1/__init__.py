@@ -399,8 +399,8 @@ class RowTemplate1(RowTemplate1Template):
         cf_dns = '1.1.1.1'
         china_dns = '114.114.114.114'
         ad = '94.140.14.14'
-        use_dns = cf_dns
-        lease_time = "1h"
+        use_dns = google_dns
+        lease_time = "10h"
         netmask = "255.255.0.0"            
         
         dnsmasq_conf = f"""
